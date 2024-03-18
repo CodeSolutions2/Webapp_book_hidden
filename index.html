@@ -91,16 +91,31 @@ let options = {method : 'GET',
 	       //referrerPolicy: "origin"
 	      };
   
-//const existingFile = await (await fetch(url, options)).json();
-//console.log("existingFile: ", existingFile);
+	//const existingFile = await (await fetch(url, options)).json();
+	//console.log("existingFile: ", existingFile);
 	
 	// OR
 
-	const existingFile1 = await fetch(url, options);
- console.log("existingFile1: ", existingFile1);
+	// Webscrapping format: it can return html
+	// const existingFile1 = await fetch(url, options);
+ 	// console.log("existingFile1: ", existingFile1);
 
-	var out = await existingFile1.text();
-	console.log("out: ", out);
+	// var out = await existingFile1.text();
+	// console.log("out: ", out);
+
+	// OR
+
+	//
+	await fetch(url, options)
+			    .then(function(response) {
+			    return response.text();
+			    })
+			    .then(function(text) {
+			    console.log('Request successful', text);
+			    })
+			    .catch(function(error) {
+			    console.log('Request failed', error)
+			    });
 
 }
 
