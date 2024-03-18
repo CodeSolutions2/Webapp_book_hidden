@@ -74,10 +74,12 @@ console.log('url: ', url); // https://raw.githubusercontent.com/CodeSolutions2/t
 // For binary data: "Content-Type": "multipart/form-data"
 // For image data: "Content-Type": "image/png", "image/jpg"
 // For PUTTING a file to storage: "Content-Type": "application/octet-stream"
+
+// Credential is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’
 	
 let headers = {
 	       "Content-Type": "application/x-www-form-urlencoded",
-	       "Access-Control-Allow-Origin": "*", 
+	      // "Access-Control-Allow-Origin": "*", 
 	       "Access-Control-Allow-Credentials": true,
 	       Accept: 'application/vnd.github+json',
 	       Authorization: `Bearer ${auth}`,
