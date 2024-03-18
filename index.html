@@ -36,7 +36,7 @@ var filename = "data.txt";
 // ----------------------------------------------------
 async function PUT_input_to_file() {
 
-	const auth = document.getElementById("auth_id").value;
+   const auth = document.getElementById("auth_id").value;
 
    var message = "add another line to file";
 	
@@ -76,7 +76,9 @@ console.log('url: ', url); // https://raw.githubusercontent.com/CodeSolutions2/t
 // For PUTTING a file to storage: "Content-Type": "application/octet-stream"
 	
 let headers = {
-	       "Content-Type": "application/x-www-form-urlencoded", 
+	       "Content-Type": "application/x-www-form-urlencoded",
+	       "Access-Control-Allow-Origin": "*", 
+	       "Access-Control-Allow-Credentials": true,
 	       Accept: 'application/vnd.github+json',
 	       Authorization: `Bearer ${auth}`,
 	       "Connection": "keep-alive"};
