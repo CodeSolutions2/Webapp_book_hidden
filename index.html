@@ -65,7 +65,9 @@ async function GET_data_from_file_way0() {
 const auth = document.getElementById("auth_id").value;
 
 // let url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
-let url = "https://api.github.com/repos/CodeSolutions2/testing_filereader/data.txt";
+//let url = "https://api.github.com/repos/CodeSolutions2/testing_filereader/data.txt";
+let url = "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt";
+console.log('url: ', url);
 
 // For text data: "Content-Type": "application/x-www-form-urlencoded"
 // For binary data: "Content-Type": "multipart/form-data"
