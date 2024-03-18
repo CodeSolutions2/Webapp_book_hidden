@@ -86,16 +86,18 @@ let headers = {
 
 // https://web.dev/articles/introduction-to-fetch
 // Types of mode: 
-// "same-origin" = only succeeds for requests for assets on the same origin, all other requests will reject.
+// "same-origin" = only succeeds for requests for assets on the same origin, all other requests will reject. Got this error with this setting: Request failed TypeError: NetworkError when attempting to fetch resource.
+	
 // "cors" = will allow requests for assets on the same-origin and other origins which return the appropriate CORs headers.
+	
 // "cors-with-forced-preflight" = will always perform a preflight check before making the actual request.
+	
 // "no-cors" = is intended to make requests to other origins that do not have CORS headers and result in an opaque response, but as stated, this isn't possible in the window global scope at the moment. Using mode: "no-cors" will give you an opaque response meaning that the body will be empty
 
 
-	
 let options = {method : 'GET', 
 	       headers: headers, 
-	       mode: 'same-origin', 
+	   //    mode: 'same-origin', 
 	       cache: "no-cache", 
 	       credentials: "include", 
 	       redirect: "follow", 
@@ -117,15 +119,18 @@ let options = {method : 'GET',
 	// OR
 
 	//
-	await fetch(url, options).then(function(response) {
-			    return response.text();
-			    })
-			    .then(function(text) {
-			    console.log('Request successful', text);
-			    })
-			    .catch(function(error) {
-			    console.log('Request failed', error)
-			    });
+	//await fetch(url, options)
+	//		    .then(function(response) {return response.text(); })
+	//		    .then(function(text) { console.log('Request successful', text); })
+	//		    .catch(function(error) { console.log('Request failed', error) });
+
+	// OR
+
+	await fetch(url, options)
+			    .then(function(response) {return response.json(); })
+			    .then(function(response) { console.log('Request successful', response); })
+		//.then(function(response) { return dispatch({type: "GET_CALL", response: response}); })
+			    .catch(function(error) { console.log('Request failed', error) });
 
 }
 
