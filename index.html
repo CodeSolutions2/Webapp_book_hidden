@@ -5,7 +5,7 @@
   </head>
   <body>
     
-    <input id="username" type="text" value="" placeholder="username" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+  <!--   <input id="username" type="text" value="" placeholder="username" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">-->
 
 <button id="PUT_input_to_file" onclick="PUT_input_to_file()" style="display:block">PUT_input_to_file</button>
 	
@@ -87,11 +87,9 @@ const existingFile = await (await fetch(
 async function create_txt_fileElement() {
   
   const objectType_input = document.createElement('input');
-
-  objectType_input.setAttribute('src', `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`);
+  objectType_input.setAttribute('type', 'file');
   objectType_input.setAttribute('id', 'text-file-input');
   objectType_input.setAttribute('accept', '.txt');
-
   document.body.appendChild(objectType_input);
 }
 
@@ -99,10 +97,25 @@ async function create_txt_fileElement() {
 async function GET_text_from_file() {
 
   // Create a input attribute on the document
-  create_txt_fileElement();
+  //await create_txt_fileElement();
 
   // Select the file event
-  document.getElementById('text-file-input').addEventListener('change', processEvent);
+  // document.getElementById('text-file-input').addEventListener('change', processEvent);
+  // OR
+
+  const reader = new FileReader();
+  reader.src = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`
+
+  // Print the information in the file to the screen
+  reader.onload = function (e) {
+    // document.getElementById('output').textContent = e.target.result;
+    // OR
+    outp.innerHTML += e.target.result;
+  }
+
+	// A method of the FileReader interface is used to read the contents of the specified Blob or File
+	//const file = document.getElementById('text-file-input') 
+  //reader.readAsText(file);
 }
 
   
