@@ -12,6 +12,9 @@
 <button id="GET_data_from_file_way0" onclick="GET_data_from_file_way0()" style="display:block">GET_data_from_file_way0</button>
     
 <button id="GET_text_from_file" onclick="GET_text_from_file()" style="display:block">GET_text_from_file</button>
+
+<input type="file" id="text_file_input" accept=".txt">
+	  
     
 <!-- View results -->
 <div id="output" style="font-family:courier;font-size:24px;height:300px"></div>
@@ -74,16 +77,14 @@ const existingFile = await (await fetch(
 
   
 
-// ----------------------------------------------------
 
 
 
 
 
 // ----------------------------------------------------
-// Way 1: FileReader
+// Way 1: FileReader Example
 // ----------------------------------------------------
-  
 async function create_txt_fileElement() {
   
   const objectType_input = document.createElement('input');
@@ -94,31 +95,8 @@ async function create_txt_fileElement() {
 }
 
 
-async function GET_text_from_file() {
+document.getElementById('text_file_input').addEventListener('change', processEvent);
 
-  // Create a input attribute on the document
-  //await create_txt_fileElement();
-
-  // Select the file event
-  // document.getElementById('text-file-input').addEventListener('change', processEvent);
-  // OR
-
-  const reader = new FileReader();
-  reader.src = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`
-
-  // Print the information in the file to the screen
-  reader.onload = function (e) {
-    // document.getElementById('output').textContent = e.target.result;
-    // OR
-    outp.innerHTML += e.target.result;
-  }
-
-	// A method of the FileReader interface is used to read the contents of the specified Blob or File
-	//const file = document.getElementById('text-file-input') 
-  //reader.readAsText(file);
-}
-
-  
 async function processEvent(event) {
   const reader = new FileReader();
   const file = event.target.files[0];
@@ -129,8 +107,39 @@ async function processEvent(event) {
     // OR
     outp.innerHTML += e.target.result;
   }
+
+// A method of the FileReader interface is used to read the contents of the specified Blob or File
   reader.readAsText(file);
 }
+
+// ----------------------------------------------------
+
+
+
+	
+
+
+// ----------------------------------------------------
+// Way 2: FileReader automatic
+// ----------------------------------------------------
+async function GET_text_from_file() {
+
+  // Create a input attribute on the document
+  //await create_txt_fileElement();
+
+  const reader = new FileReader();
+  reader.src = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`
+
+  // Print the information in the file to the screen
+  reader.onload = function (e) {
+    // document.getElementById('output').textContent = e.target.result;
+    // OR
+    outp.innerHTML += e.target.result;
+  }
+	
+}
+
+
 
 
     
