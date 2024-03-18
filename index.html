@@ -68,14 +68,15 @@ const auth = document.getElementById("auth_id").value;
 // let url = "https://api.github.com/repos/CodeSolutions2/testing_filereader/data.txt";
 // let url = "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt";
 let url = await get_txt_dataURL_in_repo();
-console.log('url: ', url);
+console.log('url: ', url); // https://raw.githubusercontent.com/CodeSolutions2/testing_filereader/main/data.txt
 
 // For text data: "Content-Type": "application/x-www-form-urlencoded"
 // For binary data: "Content-Type": "multipart/form-data"
 // For image data: "Content-Type": "image/png", "image/jpg"
 // For PUTTING a file to storage: "Content-Type": "application/octet-stream"
 	
-let headers = {"Content-Type": "application/x-www-form-urlencoded", 
+let headers = {
+	//"Content-Type": "application/x-www-form-urlencoded", 
 	       Accept: 'application/vnd.github+json',
 	       Authorization: `Bearer ${auth}`,
 	       "Connection": "keep-alive"};
@@ -83,22 +84,22 @@ let headers = {"Content-Type": "application/x-www-form-urlencoded",
 let options = {method : 'GET', 
 	       headers: headers, 
 	       mode: 'no-cors', 
-	       cache: "no-cache", 
+	    //   cache: "no-cache", 
 	       credentials: "include", 
 	       redirect: "follow", 
 	       //referrerPolicy: "origin"
 	      };
   
-//const existingFile = await (await fetch(url, options)).json();
-//console.log("existingFile: ", existingFile);
+const existingFile = await (await fetch(url, options)).json();
+console.log("existingFile: ", existingFile);
 	
 	// OR
 	
-const existingFile1 = await fetch(url, options);
-  console.log("existingFile1: ", existingFile1);
+//const existingFile1 = await fetch(url, options);
+ // console.log("existingFile1: ", existingFile1);
 
-	var out = await existingFile1.text();
-	console.log("out: ", out);
+	//var out = await existingFile1.text();
+	//console.log("out: ", out);
 
 }
 
