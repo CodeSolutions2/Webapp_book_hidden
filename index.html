@@ -13,7 +13,7 @@
     
 <button id="GET_text_from_file" onclick="GET_text_from_file()" style="display:block">GET_text_from_file</button>
 
-<input type="file" id="text_file_input" accept=".txt">
+<!-- <input type="file" id="text_file_input" accept=".txt"> -->
 	  
     
 <!-- View results -->
@@ -63,17 +63,38 @@ async function PUT_input_to_file() {
 async function GET_data_from_file_way0() {
 
 const auth = document.getElementById("auth_id").value;
+
+let url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+// For text data: "Content-Type": "application/x-www-form-urlencoded"
+// For binary data: "Content-Type": "multipart/form-data"
+// For image data: "Content-Type": "image/png", "image/jpg"
+// For PUTTING a file to storage: "Content-Type": "application/octet-stream"
+	
+let headers = {"Content-Type": "application/x-www-form-urlencoded", 
+	       Accept: 'application/vnd.github+json',
+	       Authorization: `Bearer ${auth}`,
+	       "Connection": "keep-alive"};
+
+let options = {method : 'GET', 
+	       headers: headers, 
+	       mode: 'no-cors', 
+	       cache: "no-cache", 
+	       credentials: "include", 
+	       redirect: "follow", 
+	       //referrerPolicy: "origin"
+	      };
   
-const existingFile = await (await fetch(
-    `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
-    {
-      method: 'GET',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${auth}`
-      }
-    }
-  )).json();
+const existingFile = await (await fetch(url, options)).json();
+console.log("existingFile: ", existingFile);
+	
+	// OR
+	
+const existingFile1 = await fetch(url, options);
+  console.log("existingFile1: ", existingFile1);
+
+	var out = await existingFile1.text();
+	console.log("out: ", out);
 
 }
 
