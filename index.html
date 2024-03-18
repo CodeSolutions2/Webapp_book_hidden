@@ -7,6 +7,12 @@
     
     <input id="username" type="text" value="" placeholder="username" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 
+<button id="PUT_input_to_file" onclick="PUT_input_to_file()" style="display:block">PUT_input_to_file</button>
+	
+<button id="GET_data_from_file_way0" onclick="GET_data_from_file_way0()" style="display:block">GET_data_from_file_way0</button>
+    
+<button id="GET_text_from_file" onclick="GET_text_from_file()" style="display:block">GET_text_from_file</button>
+    
 <!-- View results -->
 <div id="output" style="font-family:courier;font-size:24px;height:300px"></div>
 
@@ -14,16 +20,18 @@
 
 // ----------------------------------------------------
 
-  const outp = document.getElementById('output');
+const outp = document.getElementById('output');
   
 var repoOwner = "CodeSolutions2";
-var repoName = "testing_filereader"
-var filename = "data.txt"
-  
+var repoName = "testing_filereader";
+var filename = "data.txt";
+
+
+
 // ----------------------------------------------------
 // Way 0: REST API
 // ----------------------------------------------------
-def PUT_input_to_file() {
+async function PUT_input_to_file() {
 
    await (await fetch(
     `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
@@ -45,7 +53,7 @@ def PUT_input_to_file() {
   
 // ----------------------------------------------------
 
-def GET_data_from_file_way0() {
+async function GET_data_from_file_way0() {
   
 const existingFile = await (await fetch(
     `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
@@ -59,41 +67,60 @@ const existingFile = await (await fetch(
   )).json();
 
 }
-  
+
+
 // ----------------------------------------------------
 
-// Start with something simple
-def create_txt_fileElement() {
+
   
-  const file = document.createElement('file');
 
-  file.setAttribute('src', `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`);
+// ----------------------------------------------------
 
-  file.setAttribute('id', 'text-file-input');
-  file.setAttribute('accept', '.txt');
 
-  document.body.appendChild('file');
+
+
+
+// ----------------------------------------------------
+// Way 1: FileReader
+// ----------------------------------------------------
   
+async function create_txt_fileElement() {
+  
+  const objectType_input = document.createElement('input');
+
+  objectType_input.setAttribute('src', `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`);
+  objectType_input.setAttribute('id', 'text-file-input');
+  objectType_input.setAttribute('accept', '.txt');
+
+  document.body.appendChild(objectType_input);
 }
 
-// ----------------------------------------------------
 
-def GET_data_from_file_way1() {
+async function GET_text_from_file() {
 
+  // Create a input attribute on the document
+  create_txt_fileElement();
+
+  // Select the file event
+  document.getElementById('text-file-input').addEventListener('change', processEvent);
+}
+
+  
+async function processEvent(event) {
   const reader = new FileReader();
-
   const file = event.target.files[0];
 
+  // Print the information in the file to the screen
   reader.onload = function (e) {
     // document.getElementById('output').textContent = e.target.result;
     // OR
     outp.innerHTML += e.target.result;
   }
   reader.readAsText(file);
-
 }
 
 
+    
 // ----------------------------------------------------
   
 </script>
