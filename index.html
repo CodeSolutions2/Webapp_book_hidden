@@ -79,8 +79,8 @@ console.log('url: ', url); // https://raw.githubusercontent.com/CodeSolutions2/t
 	
 let headers = {
 	       "Content-Type": "application/x-www-form-urlencoded",
-	      // "Access-Control-Allow-Origin": "*", 
-	       "Access-Control-Allow-Credentials": true,
+	       "Access-Control-Allow-Origin": "*", 
+	      // "Access-Control-Allow-Credentials": true,
 	       Accept: 'application/vnd.github+json',
 	       Authorization: `Bearer ${auth}`,
 	       "Connection": "keep-alive"};
@@ -101,7 +101,7 @@ let options = {method : 'GET',
 	       headers: headers, 
 	   //    mode: 'same-origin', 
 	       cache: "no-cache", 
-	       credentials: "include", 
+	     //  credentials: "include", 
 	       redirect: "follow", 
 	       //referrerPolicy: "origin"
 	      };
