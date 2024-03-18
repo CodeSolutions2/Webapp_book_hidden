@@ -65,8 +65,9 @@ async function GET_data_from_file_way0() {
 const auth = document.getElementById("auth_id").value;
 
 // let url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
-//let url = "https://api.github.com/repos/CodeSolutions2/testing_filereader/data.txt";
-let url = "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt";
+// let url = "https://api.github.com/repos/CodeSolutions2/testing_filereader/data.txt";
+// let url = "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt";
+let url = await get_txt_dataURL_in_repo();
 console.log('url: ', url);
 
 // For text data: "Content-Type": "application/x-www-form-urlencoded"
@@ -171,6 +172,28 @@ async function GET_text_from_file() {
 }
 
 
+
+// ----------------------------------------------------
+
+
+async function get_txt_dataURL_in_repo() {
+
+    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
+
+	var url_vec = [];
+	await fetch(url).then(res => res.json()).then(data => {
+		    data.forEach(file => {
+		      if (file.type === 'file' && file.name.match(/.(csv|txt)$/i)) {
+			url_vec.push(file.download_url);
+		      }
+		    });
+		  }).catch(error => { outp.innerHTML += error; });
+
+   
+	const get_URLblob = url_vec[0];
+	
+	return get_URLblob;
+}
 
 
     
