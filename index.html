@@ -81,25 +81,26 @@ let headers = {
 	       Authorization: `Bearer ${auth}`,
 	       "Connection": "keep-alive"};
 
+//Using mode: "no-cors" will give you an opaque response meaning that the body will be empty
 let options = {method : 'GET', 
 	       headers: headers, 
-	       mode: 'no-cors', 
+	     //  mode: 'no-cors', 
 	    //   cache: "no-cache", 
 	       credentials: "include", 
 	       redirect: "follow", 
 	       //referrerPolicy: "origin"
 	      };
   
-const existingFile = await (await fetch(url, options)).json();
-console.log("existingFile: ", existingFile);
+//const existingFile = await (await fetch(url, options)).json();
+//console.log("existingFile: ", existingFile);
 	
 	// OR
-	
-//const existingFile1 = await fetch(url, options);
- // console.log("existingFile1: ", existingFile1);
 
-	//var out = await existingFile1.text();
-	//console.log("out: ", out);
+	const existingFile1 = await fetch(url, options);
+ console.log("existingFile1: ", existingFile1);
+
+	var out = await existingFile1.text();
+	console.log("out: ", out);
 
 }
 
