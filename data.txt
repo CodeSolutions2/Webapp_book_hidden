@@ -1,2 +1,2 @@
-colname,text
-,TEST Text inside file!
+Y,text
+y,TEST Text inside file!
