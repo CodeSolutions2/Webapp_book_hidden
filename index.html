@@ -7,11 +7,13 @@
     
  <input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 
-<button id="PUT_input_to_file" onclick="PUT_input_to_file()" style="display:block">PUT_input_to_file</button>
+<button id="PUT_text_into_file_RESTAPI" onclick="PUT_text_into_file_RESTAPI()" style="display:block">PUT_text_into_file_RESTAPI</button>
+
+<button id="PUT_text_into_file_Tensorflowjs" onclick="PUT_text_into_file_Tensorflowjs()" style="display:block">PUT_text_into_file_Tensorflowjs</button>
 	
-<button id="GET_data_from_file_way0" onclick="GET_data_from_file_way0()" style="display:block">GET_data_from_file_way0</button>
+<button id="GET_text_from_file_RESTAPI" onclick="GET_text_from_file_RESTAPI()" style="display:block">GET_text_from_file_RESTAPI</button>
     
-<button id="GET_text_from_file" onclick="GET_text_from_file()" style="display:block">GET_text_from_file</button>
+<button id="GET_text_from_file_Tensorflowjs" onclick="GET_text_from_file_Tensorflowjs()" style="display:block">GET_text_from_file_Tensorflowjs</button>
 
 <!-- <input type="file" id="text_file_input" accept=".txt"> -->
 	  
@@ -36,9 +38,9 @@ var filename = "data.txt";
 
 
 // ----------------------------------------------------
-// Way 0: REST API
+// PUT data in a file - Way 0: REST API
 // ----------------------------------------------------
-async function PUT_input_to_file() {
+async function PUT_text_into_file_RESTAPI() {
 
    const auth = document.getElementById("auth_id").value;
 
@@ -64,7 +66,38 @@ async function PUT_input_to_file() {
   
 // ----------------------------------------------------
 
-async function GET_data_from_file_way0() {
+
+// ----------------------------------------------------
+// PUT data in a file - Way 1: Tensorflow.js
+// https://www.tensorflow.org/js/guide/save_load
+// ----------------------------------------------------
+async function PUT_text_into_file_Tensorflowjs() {
+
+	const auth = document.getElementById("auth_id").value;
+	
+	await get_csvDataset()
+			.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); return csvDataset; })
+			.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); return arr; })
+			// .then(async function(arr) { await generateTable_dynamically(arr); })
+			.then(async function(arr) { arr.push("add a third line to file");  return arr; })
+			.then(async function(arr) { await arr.save(tf.io.browserHTTPRequest(
+    `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
+    {method: 'PUT', headers: {'Accept': 'application/vnd.github+json', 'Authorization': `Bearer ${auth}`} }));
+ })
+
+}
+
+
+
+
+
+
+
+	
+// ----------------------------------------------------
+// GET data from a file - Way 0: REST API 
+// ----------------------------------------------------
+async function GET_text_from_file_RESTAPI() {
 
 const auth = document.getElementById("auth_id").value;
 
@@ -99,7 +132,6 @@ let headers = {
 // "cors-with-forced-preflight" = will always perform a preflight check before making the actual request.
 	
 // "no-cors" = is intended to make requests to other origins that do not have CORS headers and result in an opaque response, but as stated, this isn't possible in the window global scope at the moment. Using mode: "no-cors" will give you an opaque response meaning that the body will be empty
-
 
 let options = {method : 'GET', 
 	       headers: headers, 
@@ -139,89 +171,19 @@ let options = {method : 'GET',
 			    .catch(function(error) { console.log('Request failed', error) });
 
 }
-
-
-// ----------------------------------------------------
-
-
-  
-
-
-
-
-
-
-// ----------------------------------------------------
-// Way 1: FileReader Example
-// it reads the file from the Computer
-// ----------------------------------------------------
-async function create_txt_fileElement() {
-  
-  const objectType_input = document.createElement('input');
-  objectType_input.setAttribute('type', 'file');
-  objectType_input.setAttribute('id', 'text-file-input');
-  objectType_input.setAttribute('accept', '.txt');
-  document.body.appendChild(objectType_input);
-}
-
-
-// document.getElementById('text_file_input').addEventListener('change', processEvent);
-
-async function processEvent(event) {
-  const reader = new FileReader();
-  const file = event.target.files[0];
-
-  // Print the information in the file to the screen
-  reader.onload = function (e) {
-    // document.getElementById('output').textContent = e.target.result;
-    // OR
-    outp.innerHTML += e.target.result;
-  }
-
-// A method of the FileReader interface is used to read the contents of the specified Blob or File
-  reader.readAsText(file);
-}
-
-// ----------------------------------------------------
-
-
-
-	
-
-
-// ----------------------------------------------------
-// Way 2: FileReader automatic
-// ----------------------------------------------------
-// async function GET_text_from_file() {
-
-  // Create a input attribute on the document
-  //await create_txt_fileElement();
-
-//   const reader = new FileReader();
-//   reader.src = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`
-
-  // Print the information in the file to the screen
-  // reader.onload = function (e) {
-    // document.getElementById('output').textContent = e.target.result;
-    // OR
-    // outp.innerHTML += e.target.result;
-//   }
-	
-// }
-
 // ----------------------------------------------------
 
 
 // ----------------------------------------------------
-// Way 2: Read file using TensorFlow
+// GET data in a file - Way 1: Tensorflow.js
 // https://js.tensorflow.org/api/1.0.0/
 // ----------------------------------------------------
-async function GET_text_from_file() {
+async function GET_text_from_file_Tensorflowjs() {
 
 	await get_csvDataset()
 		.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); return csvDataset; })
 		.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); return arr; })
-		.then(async function(arr) { console.log(arr); await generateTable_dynamically(arr); })
+		.then(async function(arr) { await generateTable_dynamically(arr); })
 
 }
 
@@ -256,7 +218,6 @@ async function csvDataset_2_array(csvDataset){
 	tensors.forEach(async function(rowdata, index) {
 
 		let col0 = Object.values(rowdata.xs);
-		console.log(col0);
 		arr.push(col0);
 		
 	});  // end of forEach
