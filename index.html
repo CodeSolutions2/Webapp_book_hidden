@@ -217,8 +217,9 @@ async function processEvent(event) {
 async function GET_text_from_file() {
 
 	await get_csvDataset()
-		.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { colname: {isLabel: false} } }); console.log(csvDataset); return csvDataset; })
-		.then(async function(csvDataset) { await generateTable_dynamically(csvDataset); })
+		.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { colname: {isLabel: false} } }); return csvDataset; })
+		.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); console.log(arr); return arr; })
+		.then(async function(arr) { await generateTable_dynamically(arr); })
 
 }
 
@@ -244,20 +245,33 @@ async function get_csvDataset() {
 	return get_csvDataset_URLblob;
 }
 
+async function csvDataset_2_array(csvDataset){
 
+	let arr = [];
+	
+	const tensors = await csvDataset.toArray();
+	tensors.forEach(async function(rowdata, index) {
 
-async function generateTable_dynamically(csvDataset) {
+		let col0 = Object.values(rowdata.xs);
+		arr.push(col0);
+		
+	});  // end of forEach
+
+	return arr;
+}
+
+async function generateTable_dynamically(arr) {
 	const tbl = document.createElement("table");
 	const tblBody = document.createElement("tbody");
 
 	// Create row cells dynamically
-	for (let i=0; i < csvDataset.length; i++){
+	for (let i=0; i < arr.length; i++){
 		// create a table row
 		const row = document.createElement("tr");
 
-		for (let j=0; j < csvDataset[0].length; j++){
+		for (let j=0; j < arr[0].length; j++){
 			const cell = document.createElement("td");
-			const cellText = document.createTextNode(`${csvDataset[i][j]}`);
+			const cellText = document.createTextNode(`${arr[i][j]}`);
 			cell.appendChild(cellText);
 			row.appendChild(cell);
 		}
