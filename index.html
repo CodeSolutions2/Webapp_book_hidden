@@ -20,6 +20,7 @@
 <div id="output" style="font-family:courier;font-size:24px;height:300px"></div>
 
 
+
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 	  
 <script>
@@ -218,8 +219,8 @@ async function processEvent(event) {
 async function GET_text_from_file() {
 
 	await get_csvDataset()
-		.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); console.log(csvDataset); return csvDataset; })
-		.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); console.log(arr); return arr; })
+		.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); return csvDataset; })
+		.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); return arr; })
 		.then(async function(arr) { await generateTable_dynamically(arr); })
 
 }
