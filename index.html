@@ -80,9 +80,11 @@ async function PUT_text_into_file_Tensorflowjs() {
 			.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); return arr; })
 			// .then(async function(arr) { await generateTable_dynamically(arr); })
 			.then(async function(arr) { arr.push("add a third line to file");  return arr; })
-			.then(async function(arr) { await arr.save(tf.io.browserHTTPRequest(
-    `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
-    {method: 'PUT', headers: {'Accept': 'application/vnd.github+json', 'Authorization': `Bearer ${auth}`} }));
+			.then(async function(arr) { tf.data.arr.save('https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data2.csv')
+				
+	// await arr.save(tf.io.browserHTTPRequest(
+   //  `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
+ //    {method: 'PUT', headers: {'Accept': 'application/vnd.github+json', 'Authorization': `Bearer ${auth}`} }));
  })
 
 }
@@ -104,7 +106,7 @@ const auth = document.getElementById("auth_id").value;
 // let url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 // let url = "https://api.github.com/repos/CodeSolutions2/testing_filereader/data.txt";
 // let url = "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt";
-let url = await get_txt_dataURL_in_repo();
+let url = await get_csvDataset();
 console.log('url: ', url); // https://raw.githubusercontent.com/CodeSolutions2/testing_filereader/main/data.txt
 
 // For text data: "Content-Type": "application/x-www-form-urlencoded"
