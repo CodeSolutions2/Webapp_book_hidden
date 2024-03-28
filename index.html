@@ -221,7 +221,7 @@ async function GET_text_from_file() {
 	await get_csvDataset()
 		.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); return csvDataset; })
 		.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); return arr; })
-		.then(async function(arr) { await generateTable_dynamically(arr); })
+		.then(async function(arr) { console.log(arr); await generateTable_dynamically(arr); })
 
 }
 
@@ -256,6 +256,7 @@ async function csvDataset_2_array(csvDataset){
 	tensors.forEach(async function(rowdata, index) {
 
 		let col0 = Object.values(rowdata.xs);
+		console.log(col0);
 		arr.push(col0);
 		
 	});  // end of forEach
