@@ -217,7 +217,7 @@ async function processEvent(event) {
 async function GET_text_from_file() {
 
 	await get_csvDataset()
-		.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { colname: {isLabel: false} } }); return csvDataset; })
+		.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob); return csvDataset; })
 		.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); console.log(arr); return arr; })
 		.then(async function(arr) { await generateTable_dynamically(arr); })
 
