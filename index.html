@@ -73,7 +73,7 @@ async function PUT_text_into_file_RESTAPI() {
 // ----------------------------------------------------
 async function PUT_text_into_file_Tensorflowjs() {
 
-	const auth = document.getElementById("auth_id").value;
+	//const auth = document.getElementById("auth_id").value;
 	
 	await get_csvDataset()
 			.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); return csvDataset; })
