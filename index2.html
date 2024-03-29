@@ -22,6 +22,7 @@
 <div id="output" style="font-family:courier;font-size:24px;height:300px"></div>
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/github-api/3.4.0/GitHub.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 	  
@@ -103,9 +104,80 @@ writer = tf.io.TFRecordWriter(out_file);
 
 }
 
+// ----------------------------------------------------
+// PUT data in a file - Way 2: Github_repoapi
+// https://www.tensorflow.org/js/guide/save_load
+// ----------------------------------------------------
+async function PUT_text_into_file_Github_repoapi() {
+	
+	await get_csvDataset()
+			.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); return csvDataset; })
+			.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); return arr; })
+			// .then(async function(arr) { await generateTable_dynamically(arr); })
+			.then(async function(arr) { arr.push("add a third line to file");  return arr; })
+			.then(async function(arr) { await put_results_in_CSVfile(arr); })
 
+}
+	
 
+async function put_results_in_CSVfile(arr) {
+    
+    // ---------------------
+    // Puts array into csv format
+    // const blob = new Blob([arr], { type: 'text/csv;charset=utf-8;' });
 
+    // Create a url for the data object
+    // const url = URL.createObjectURL(blob);
+    // ---------------------
+    // OR
+    // ---------------------
+    // Puts array into csv format
+    // let csvString = "data:text/csv; charset=utf-8";
+    // arr.forEach(function(row_array) {
+	// csvString += row_array.join(",") + "\r\n";
+    // });
+    // OR
+    let csvString = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+	  
+    // Create a url for the data object
+    // var url = encodeURI(csvString);
+    // ---------------------
+
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+
+    const filename = 'data2.csv';
+    link.setAttribute("download", filename);
+	  
+    link.style.display = 'block';
+
+    outp.innerHTML += 'Download CSV here: ' + url + "<br/>";
+    // document.body.appendChild(link);
+	
+    // ---------------------
+	
+    // Automatic download of csv
+    // link.click();
+    // document.body.removeChild(link);
+	
+    // ---------------------
+    
+    // Push the file to a GitHub repository
+    const auth = document.getElementById("auth_id").value;
+    const gh = new GitHub({ token: auth });
+    const repo = gh.getRepo(repoOwner, repoName);
+
+    repo.writeFile('master', filename, csvString, 'Adding CSV file', (err) => {
+      if (err) {
+        console.error('Error pushing file to GitHub:', err);
+      } else {
+        console.log('File pushed to GitHub successfully');
+      }
+    });
+
+    // ---------------------
+	  
+}
 
 
 
