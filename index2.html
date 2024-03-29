@@ -5,11 +5,16 @@
   </head>
   <body>
     
-<!-- <input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;"> -->
+<input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;"> 
 
 <!-- <button id="PUT_text_into_file_RESTAPI" onclick="PUT_text_into_file_RESTAPI()" style="display:block">PUT_text_into_file_RESTAPI</button> -->
 
 <!--<button id="PUT_text_into_file_Tensorflowjs" onclick="PUT_text_into_file_Tensorflowjs()" style="display:block">PUT_text_into_file_Tensorflowjs</button> -->
+
+	  
+<button id="PUT_text_into_file_Github_repoapi" onclick="PUT_text_into_file_Github_repoapi()" style="display:block">PUT_text_into_file_Github_repoapi</button>
+
+	  
 	
 <!-- <button id="GET_text_from_file_RESTAPI" onclick="GET_text_from_file_RESTAPI()" style="display:block">GET_text_from_file_RESTAPI</button> -->
     
@@ -143,15 +148,15 @@ async function put_results_in_CSVfile(arr) {
     // var url = encodeURI(csvString);
     // ---------------------
 
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
+    // const link = document.createElement("a");
+    // link.setAttribute("href", url);
 
     const filename = 'data2.csv';
-    link.setAttribute("download", filename);
+    // link.setAttribute("download", filename);
 	  
-    link.style.display = 'block';
+    // link.style.display = 'block';
 
-    outp.innerHTML += 'Download CSV here: ' + url + "<br/>";
+    // outp.innerHTML += 'Download CSV here: ' + url + "<br/>";
     // document.body.appendChild(link);
 	
     // ---------------------
