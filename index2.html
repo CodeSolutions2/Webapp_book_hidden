@@ -142,8 +142,9 @@ async function put_results_in_CSVfile(arr) {
 	// csvString += row_array.join(",") + "\r\n";
     // });
     // OR
-    let csvString = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
-	  
+    let csvString = "data:text/csv;charset=utf-8," + arr.map(e => e.join(",")).join("\n");
+    console.log('csvString: ', csvString);
+	
     // Create a url for the data object
     // var url = encodeURI(csvString);
     // ---------------------
