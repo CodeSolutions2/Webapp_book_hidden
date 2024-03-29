@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    
+<!-- <input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;"> -->
+
+<!-- <button id="PUT_text_into_file_RESTAPI" onclick="PUT_text_into_file_RESTAPI()" style="display:block">PUT_text_into_file_RESTAPI</button> -->
+
+<!--<button id="PUT_text_into_file_Tensorflowjs" onclick="PUT_text_into_file_Tensorflowjs()" style="display:block">PUT_text_into_file_Tensorflowjs</button> -->
+	
+<!-- <button id="GET_text_from_file_RESTAPI" onclick="GET_text_from_file_RESTAPI()" style="display:block">GET_text_from_file_RESTAPI</button> -->
+    
+<button id="GET_text_from_file_Tensorflowjs" onclick="GET_text_from_file_Tensorflowjs()" style="display:block">GET_text_from_file_Tensorflowjs</button>
+
+<!-- <input type="file" id="text_file_input" accept=".txt"> -->
+	  
+    
+<!-- View results -->
+<div id="output" style="font-family:courier;font-size:24px;height:300px"></div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+	  
+<script>
+
+// ----------------------------------------------------
+
+const outp = document.getElementById('output');
+  
+var repoOwner = "CodeSolutions2";
+var repoName = "testing_filereader";
+var filename = "data.txt";
+
+
+
+// ----------------------------------------------------
+// PUT data in a file - Way 0: REST API
+// ----------------------------------------------------
+async function PUT_text_into_file_RESTAPI() {
+
+   const auth = document.getElementById("auth_id").value;
+
+   var message = "add another line to file";
+	
+   await (await fetch(
+    `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
+    {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${auth}`
+      },
+      body: JSON.stringify({
+        message: message,
+     //   content: btoa(content),
+       // sha: existingFile.sha,
+      }),
+    }
+  )).json();
+
+}
+  
+// ----------------------------------------------------
+
+
+// ----------------------------------------------------
+// PUT data in a file - Way 1: Tensorflow.js
+// https://www.tensorflow.org/js/guide/save_load
+// ----------------------------------------------------
+async function PUT_text_into_file_Tensorflowjs() {
+
+	//const auth = document.getElementById("auth_id").value;
+	
+	await get_csvDataset()
+			.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); return csvDataset; })
+			.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); return arr; })
+			// .then(async function(arr) { await generateTable_dynamically(arr); })
+			.then(async function(arr) { arr.push("add a third line to file");  return arr; })
+			.then(async function(arr) { 
+
+				out_file = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/data2.csv`
+writer = tf.io.TFRecordWriter(out_file);
+				example = tf.train.Example(
+          features=tf.train.Features(
+            feature={
+              'xs': tf.train.Feature(
+                  float_list=tf.train.FloatList(
+                      value=arr.flatten()))
+            }
+          )
+        )
+				// Write the example.
+        writer.write(example.SerializeToString())
+				
+	// await arr.save(tf.io.browserHTTPRequest(
+   //  `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
+ //    {method: 'PUT', headers: {'Accept': 'application/vnd.github+json', 'Authorization': `Bearer ${auth}`} }));
+ })
+
+}
+
+
+
+
+
+
+
+	
+// ----------------------------------------------------
+// GET data from a file - Way 0: REST API 
+// ----------------------------------------------------
+async function GET_text_from_file_RESTAPI() {
+
+const auth = document.getElementById("auth_id").value;
+
+// let url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+// let url = "https://api.github.com/repos/CodeSolutions2/testing_filereader/data.txt";
+// let url = "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt";
+let url = await get_csvDataset();
+console.log('url: ', url); // https://raw.githubusercontent.com/CodeSolutions2/testing_filereader/main/data.txt
+
+// For text data: "Content-Type": "application/x-www-form-urlencoded"
+// For binary data: "Content-Type": "multipart/form-data"
+// For image data: "Content-Type": "image/png", "image/jpg"
+// For PUTTING a file to storage: "Content-Type": "application/octet-stream"
+
+// Credential is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’
+	
+let headers = {
+	       "Content-Type": "application/x-www-form-urlencoded",
+	       "Access-Control-Allow-Origin": "*", 
+	      // "Access-Control-Allow-Credentials": true,
+	       Accept: 'application/vnd.github+json',
+	       Authorization: `Bearer ${auth}`,
+	       "Connection": "keep-alive"};
+
+
+// https://web.dev/articles/introduction-to-fetch
+// Types of mode: 
+// "same-origin" = only succeeds for requests for assets on the same origin, all other requests will reject. Got this error with this setting: Request failed TypeError: NetworkError when attempting to fetch resource.
+	
+// "cors" = will allow requests for assets on the same-origin and other origins which return the appropriate CORs headers.
+	
+// "cors-with-forced-preflight" = will always perform a preflight check before making the actual request.
+	
+// "no-cors" = is intended to make requests to other origins that do not have CORS headers and result in an opaque response, but as stated, this isn't possible in the window global scope at the moment. Using mode: "no-cors" will give you an opaque response meaning that the body will be empty
+
+let options = {method : 'GET', 
+	       headers: headers, 
+	   //    mode: 'same-origin', 
+	       cache: "no-cache", 
+	     //  credentials: "include", 
+	       redirect: "follow", 
+	       //referrerPolicy: "origin"
+	      };
+  
+	//const existingFile = await (await fetch(url, options)).json();
+	//console.log("existingFile: ", existingFile);
+	
+	// OR
+
+	// Webscrapping format: it can return html
+	// const existingFile1 = await fetch(url, options);
+ 	// console.log("existingFile1: ", existingFile1);
+
+	// var out = await existingFile1.text();
+	// console.log("out: ", out);
+
+	// OR
+
+	//
+	//await fetch(url, options)
+	//		    .then(function(response) {return response.text(); })
+	//		    .then(function(text) { console.log('Request successful', text); })
+	//		    .catch(function(error) { console.log('Request failed', error) });
+
+	// OR
+
+	await fetch(url, options)
+			    .then(function(response) {return response.json(); })
+			    .then(function(response) { console.log('Request successful', response); })
+		//.then(function(response) { return dispatch({type: "GET_CALL", response: response}); })
+			    .catch(function(error) { console.log('Request failed', error) });
+
+}
+// ----------------------------------------------------
+
+
+// ----------------------------------------------------
+// GET data in a file - Way 1: Tensorflow.js
+// https://js.tensorflow.org/api/1.0.0/
+// ----------------------------------------------------
+async function GET_text_from_file_Tensorflowjs() {
+
+	await get_csvDataset()
+		.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); return csvDataset; })
+		.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); return arr; })
+		.then(async function(arr) { await generateTable_dynamically(arr); })
+
+}
+
+  
+async function get_csvDataset() {
+	
+	const repoOwner = 'CodeSolutions2';
+	const repoName = 'testing_filereader';
+	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
+
+	var url_vec = [];
+	await fetch(url).then(res => res.json()).then(data => {
+		    data.forEach(file => {
+		      if (file.type === 'file' && file.name.match(/.(csv|txt)$/i)) {
+			url_vec.push(file.download_url);
+		      }
+		    });
+		  }).catch(error => { outp.innerHTML += error; });
+
+	const get_csvDataset_URLblob = url_vec[0];
+	console.log('get_csvDataset_URLblob: ', get_csvDataset_URLblob);
+    
+	return get_csvDataset_URLblob;
+}
+
+	
+async function csvDataset_2_array(csvDataset){
+
+	let arr = [];
+	
+	const tensors = await csvDataset.toArray();
+	tensors.forEach(async function(rowdata, index) {
+
+		let col0 = Object.values(rowdata.xs);
+		arr.push(col0);
+		
+	});  // end of forEach
+
+	return arr;
+}
+
+async function generateTable_dynamically(arr) {
+	const tbl = document.createElement("table");
+	const tblBody = document.createElement("tbody");
+
+	// Create row cells dynamically
+	for (let i=0; i < arr.length; i++){
+		// create a table row
+		const row = document.createElement("tr");
+
+		for (let j=0; j < arr[0].length; j++){
+			const cell = document.createElement("td");
+			const cellText = document.createTextNode(`${arr[i][j]}`);
+			cell.appendChild(cellText);
+			row.appendChild(cell);
+		}
+
+		// add a row to the end of the table
+		tblBody.appendChild(row);
+	}
+	tbl.appendChild(tblBody);
+
+	document.body.appendChild(tbl);
+  }
+	
+// ----------------------------------------------------
+  
+</script>
+
+  </body>
+</html>
