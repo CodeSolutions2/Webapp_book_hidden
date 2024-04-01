@@ -126,14 +126,14 @@ var gh = new GitHub({
 	let branch = 'main';
 	// let filePath = `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`;
 	let filePath = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
-	gh.getRepo(repoOwner, repoName)
-	    .then(res => { this.getSha(branch, filePath).then(data => { console.log(data); });
-			 });
+	//gh.getRepo(repoOwner, repoName)
+	 //   .then(res => { this.getSha(branch, filePath).then(data => { console.log(data); });
+	//		 });
 
 
 
 	// Create a gist
-	// var gist = gh.getGist(); // not a gist yet
+	var gist = gh.getGist(); // not a gist yet
 	
 	// var data = {
 	 //   public: true,
