@@ -13,7 +13,7 @@
 
 <!--<button id="PUT_text_into_file_Tensorflowjs" onclick="PUT_text_into_file_Tensorflowjs()" style="display:block">PUT_text_into_file_Tensorflowjs</button> -->
 	
-<!-- <button id="GET_text_from_file_RESTAPI" onclick="GET_text_from_file_RESTAPI()" style="display:block">GET_text_from_file_RESTAPI</button> -->
+<button id="GET_text_from_file_RESTAPI" onclick="GET_text_from_file_RESTAPI()" style="display:block">GET_text_from_file_RESTAPI</button>
     
 <button id="GET_text_from_file_Tensorflowjs" onclick="GET_text_from_file_Tensorflowjs()" style="display:block">GET_text_from_file_Tensorflowjs</button>
 
@@ -44,32 +44,6 @@ var filename = "data.txt";
 // ----------------------------------------------------
 // PUT data in a file - Way 0: REST API
 // ----------------------------------------------------
-async function GET_sha_RESTAPI() {
-
-   const auth = document.getElementById("auth_id").value;
-
-let headers = {
-	"Accept": 'application/vnd.github+json', 
-	//"Authorization": `Bearer ${auth}`,
-	//"Connection": "keep-alive"
-};
-	
-	let options = {'method' : 'GET', 
-		       'headers': headers, 
-		       'credentials': "same-origin"
-		      };
-
-	
-   await fetch(`https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`, options)
-	.then(res => res.json())
-	.then(data => { console.log(data); })
-	.catch(error => { console.log(error); });
-
-}
-
-
-	
-	
 async function PUT_text_into_file_RESTAPI() {
 
    const auth = document.getElementById("auth_id").value;
@@ -150,21 +124,33 @@ const auth = document.getElementById("auth_id").value;
 let url = await get_csvDataset();
 console.log('url: ', url); // https://raw.githubusercontent.com/CodeSolutions2/testing_filereader/main/data.txt
 
+// OR
+
+// To get sha code
+let url = `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`;
+	
+
 // For text data: "Content-Type": "application/x-www-form-urlencoded"
 // For binary data: "Content-Type": "multipart/form-data"
 // For image data: "Content-Type": "image/png", "image/jpg"
 // For PUTTING a file to storage: "Content-Type": "application/octet-stream"
 
 // Credential is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’
+
+// The first 3 should be assigned on the server, but Github pages says that these things are already assigned; they should not be in the client request.
 	
 let headers = {
-	       "Content-Type": "application/x-www-form-urlencoded",
 	       "Access-Control-Allow-Origin": "*", 
+	      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+	      "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization",
+	      "Content-Type": "application/x-www-form-urlencoded",
 	      // "Access-Control-Allow-Credentials": true,
 	       Accept: 'application/vnd.github+json',
 	       Authorization: `Bearer ${auth}`,
-	       "Connection": "keep-alive"};
+	       "Connection": "keep-alive"
+	      };
 
+let headers2 = new Headers(headers);
 
 // https://web.dev/articles/introduction-to-fetch
 // Types of mode: 
@@ -177,10 +163,11 @@ let headers = {
 // "no-cors" = is intended to make requests to other origins that do not have CORS headers and result in an opaque response, but as stated, this isn't possible in the window global scope at the moment. Using mode: "no-cors" will give you an opaque response meaning that the body will be empty
 
 let options = {method : 'GET', 
-	       headers: headers, 
-	   //    mode: 'same-origin', 
+	       headers: headers2, 
+	       //    mode: 'same-origin', 
 	       cache: "no-cache", 
-	     //  credentials: "include", 
+	       //  credentials: "include",
+	       // 'credentials': "same-origin"
 	       redirect: "follow", 
 	       //referrerPolicy: "origin"
 	      };
@@ -212,6 +199,14 @@ let options = {method : 'GET',
 			    .then(function(response) { console.log('Request successful', response); })
 		//.then(function(response) { return dispatch({type: "GET_CALL", response: response}); })
 			    .catch(function(error) { console.log('Request failed', error) });
+
+
+	// OR
+
+	// await fetch(url, options)
+	//.then(res => res.json())
+	//.then(data => { console.log(data); })
+	//.catch(error => { console.log(error); });
 
 }
 // ----------------------------------------------------
