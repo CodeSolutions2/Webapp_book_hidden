@@ -64,6 +64,8 @@ async function PUT_text_into_file_RESTAPI() {
   )).json();
 
 }
+
+// 401 Unauthorized: lacks valid authentication credentials for the requested resource
   
 // ----------------------------------------------------
 
@@ -83,19 +85,7 @@ async function PUT_text_into_file_Tensorflowjs() {
 			.then(async function(arr) { arr.push("add a third line to file");  return arr; })
 			.then(async function(arr) { 
 
-				out_file = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/data2.csv`
-writer = tf.io.TFRecordWriter(out_file);
-				example = tf.train.Example(
-          features=tf.train.Features(
-            feature={
-              'xs': tf.train.Feature(
-                  float_list=tf.train.FloatList(
-                      value=arr.flatten()))
-            }
-          )
-        )
-				// Write the example.
-        writer.write(example.SerializeToString())
+				// Write data to file on Github repo
 				
 	// await arr.save(tf.io.browserHTTPRequest(
    //  `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
@@ -127,7 +117,7 @@ console.log('url: ', url); // https://raw.githubusercontent.com/CodeSolutions2/t
 // OR
 
 // To get sha code
-let url = `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`;
+let url_sha = `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`;
 	
 
 // For text data: "Content-Type": "application/x-www-form-urlencoded"
@@ -194,7 +184,7 @@ let options = {method : 'GET',
 
 	// OR
 
-	await fetch(url, options)
+	await fetch(url_sha, options)
 			    .then(function(response) {return response.json(); })
 			    .then(function(response) { console.log('Request successful', response); })
 		//.then(function(response) { return dispatch({type: "GET_CALL", response: response}); })
