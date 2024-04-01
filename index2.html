@@ -54,20 +54,15 @@ async function PUT_text_into_file_RESTAPI() {
 
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
+   var content = 'add another line to file\n';
+
    await fetch(url).then(res => res.json()).then(data => {
 	let sha_val = data.sha; console.log('sha_val: ', sha_val); return sha_val; })
-	.then(async function (sha_val) { await fetch(url,
-    {
-      method: 'PUT',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${auth}`
-      },
-      body: JSON.stringify({
-        message: message}),
-	    sha: sha_val,
-    }
-  ) })
+	.then(async function (sha_val) { 
+		var data = {'branch': 'main', 'message': message, 'content': btoa(content), 'sha': sha_val};
+		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`}
+		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
+		await var out = fetch(url, options); return out; })
 	.then(res => { console.log(res); } )
 	.catch(error => { console.log(error); });
 	
@@ -130,15 +125,13 @@ var gh = new GitHub({
 	let branch = 'main';
 	// let filePath = `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`;
 	let filePath = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
-	//gh.getRepo(repoOwner, repoName)
-	 //   .then(res => { this.getSha(branch, filePath).then(data => { console.log(data); });
-	//		 });
 
+	//GET https://codesolutions2.github.io/repos/undefined/contents/https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data.txt?ref=main
 
-	var rep = gh.getRepo();
+	var rep = gh.getRepo(repoOwner, repoName);
 	console.log('rep:', rep);
 
-	rep.getSha(branch, filePath).then(data => { console.log(data); });
+	rep.getSha(branch, filename).then(data => { console.log(data); });
 
 	
 	// Create a gist
