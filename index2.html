@@ -29,6 +29,7 @@
 <!-- Search for tensorflow library that performs fetch: cdnjs api_react_native 1.0.0, -->
 
 <script src="https://unpkg.com/github-api/dist/GitHub.bundle.min.js"></script>
+<!-- https://github-tools.github.io/github/ -->
 	  
 <script>
 
@@ -61,10 +62,15 @@ async function PUT_text_into_file_RESTAPI() {
       },
       body: JSON.stringify({
         message: message}),
+	    sha: existingFile.sha,
     }
   )).json();
 
 }
+
+// async function GET_sha_for_file(){
+	
+// }
 
 // 401 Unauthorized: lacks valid authentication credentials for the requested resource
   
@@ -110,6 +116,45 @@ var gh = new GitHub({
 })
 
 	console.log(gh);
+
+	// let ref = 
+	// let path = 
+	// let raw = 'false';  //`true` if the results should be returned raw instead of GitHub's normalized format
+	// var repo_contents = gh.getContents(ref, path, raw, 
+	// 				   data => { console.log(data); });
+
+	let branch = 'main';
+	// let filePath = `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`;
+	let filePath = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+	gh.getSha(branch, filePath)
+		.then(data => { console.log(data); });
+
+
+
+	// Create a gist
+	// var gist = gh.getGist(); // not a gist yet
+	
+	// var data = {
+	 //   public: true,
+	 //   description: 'My first gist',
+	  //  files: {
+	   //    "file1.txt": {
+	    //      contents: "Aren't gists great!"
+	     //  }
+	  //  }
+	// };
+
+//gist.create(data)
+//  .then(function(httpResponse) {
+//     var gistJson = httpResponse.data;
+
+     // Callbacks too
+//     gist.read(function(err, gist, xhr) {
+        // if no error occurred then err == null
+        // gistJson == httpResponse.data
+        // xhr == httpResponse
+//     });
+//  });
 
 
 }
