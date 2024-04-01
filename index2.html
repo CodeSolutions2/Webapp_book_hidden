@@ -62,7 +62,7 @@ async function PUT_text_into_file_RESTAPI() {
 		var data = {'branch': 'main', 'message': message, 'content': btoa(content), 'sha': sha_val};
 		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`}
 		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
-		await var out = fetch(url, options); return out; })
+	        var out = await fetch(url, options); return out; })
 	.then(res => { console.log(res); } )
 	.catch(error => { console.log(error); });
 	
