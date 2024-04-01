@@ -7,17 +7,10 @@
     
 <input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 	  
-<button id="PUT_text_into_file_RESTAPI" onclick="PUT_text_into_file_RESTAPI()" style="display:block">PUT_text_into_file_RESTAPI</button>
-
-<!--<button id="PUT_text_into_file_Tensorflowjs" onclick="PUT_text_into_file_Tensorflowjs()" style="display:block">PUT_text_into_file_Tensorflowjs</button> -->
-
-<button id="GET_text_from_file_GITHUBAPI" onclick="GET_text_from_file_GITHUBAPI()" style="display:block">GET_text_from_file_GITHUBAPI</button>
-	  
 <button id="GET_repo_file_info_RESTAPI" onclick="GET_repo_file_info_RESTAPI()" style="display:block">GET_repo_file_info_RESTAPI</button>
     
 <button id="GET_text_from_file_Tensorflowjs" onclick="GET_text_from_file_Tensorflowjs()" style="display:block">GET_text_from_file_Tensorflowjs</button>
 
-<!-- <input type="file" id="text_file_input" accept=".txt"> -->
 	  
     
 <!-- View results -->
@@ -25,11 +18,8 @@
 
 	  
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-react-native/dist/index.min.js"></script> -->
-<!-- Search for tensorflow library that performs fetch: cdnjs api_react_native 1.0.0, -->
 
-<script src="https://unpkg.com/github-api/dist/GitHub.bundle.min.js"></script>
-<!-- https://github-tools.github.io/github/ -->
+
 	  
 <script>
 
@@ -43,130 +33,6 @@ var filename = "data.txt";
 
 
 
-// ----------------------------------------------------
-// PUT data in a file - Way 0: REST API
-// ----------------------------------------------------
-async function PUT_text_into_file_RESTAPI() {
-
-   const auth = document.getElementById("auth_id").value;
-
-   var message = "commit message";
-
-   var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
-
-   var content = 'add another line to file\n';
-	// btoa(content)
-	// Base64.encode(content)
-	
-
-   await fetch(url).then(res => res.json()).then(data => {
-	let sha_val = data.sha; console.log('sha_val: ', sha_val); return sha_val; })
-	.then(async function (sha_val) { 
-		var data = {'branch': 'main', 'message': message, 'content': content, 'sha': sha_val};
-		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`}
-		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
-	        var out = await fetch(url, options); return out; })
-	.then(res => { console.log(res); } )
-	.catch(error => { console.log(error); });
-	
-   //await (await ).json();
-
-}
-
-
-// 401 Unauthorized: lacks valid authentication credentials for the requested resource
-  
-// ----------------------------------------------------
-
-
-// ----------------------------------------------------
-// PUT data in a file - Way 1: Tensorflow.js
-// https://www.tensorflow.org/js/guide/save_load
-// ----------------------------------------------------
-async function PUT_text_into_file_Tensorflowjs() {
-
-	//const auth = document.getElementById("auth_id").value;
-	
-	await get_csvDataset()
-			.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); return csvDataset; })
-			.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); return arr; })
-			// .then(async function(arr) { await generateTable_dynamically(arr); })
-			.then(async function(arr) { arr.push("add a third line to file");  return arr; })
-			.then(async function(arr) { 
-
-				// Write data to file on Github repo
-				
-	// await arr.save(tf.io.browserHTTPRequest(
-   //  `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
- //    {method: 'PUT', headers: {'Accept': 'application/vnd.github+json', 'Authorization': `Bearer ${auth}`} }));
- })
-
-}
-
-// ----------------------------------------------------
-// GET data from a file - Way 0: GITHUB API
-// ----------------------------------------------------
-async function GET_text_from_file_GITHUBAPI() {
-
-const auth = document.getElementById("auth_id").value;
-
-	// basic auth
-var gh = new GitHub({
-   username: repoOwner,
-   // password: 'NotFoo',
-      token: auth
-})
-
-	console.log(gh);
-
-	// let ref = 
-	// let path = 
-	// let raw = 'false';  //`true` if the results should be returned raw instead of GitHub's normalized format
-	// var repo_contents = gh.getContents(ref, path, raw, 
-	// 				   data => { console.log(data); });
-
-	let branch = 'main';
-	// let filePath = `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`;
-	let filePath = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
-
-	//GET https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data.txt?ref=main
-	var rep = gh.getRepo(repoOwner, repoName);
-	console.log('rep:', rep);
-	// OK
-	
-	
-	rep.getSha(branch, filename).then(res => res).then(data => { console.log(data); });
-	// Error: 401 error making request get https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data.txt?ref=main: ""
-	
-	// Create a gist
-	// var gist = gh.getGist(); // not a gist yet
-	
-	// var data = {
-	 //   public: true,
-	 //   description: 'My first gist',
-	  //  files: {
-	   //    "file1.txt": {
-	    //      contents: "Aren't gists great!"
-	     //  }
-	  //  }
-	// };
-
-//gist.create(data)
-//  .then(function(httpResponse) {
-//     var gistJson = httpResponse.data;
-
-     // Callbacks too
-//     gist.read(function(err, gist, xhr) {
-        // if no error occurred then err == null
-        // gistJson == httpResponse.data
-        // xhr == httpResponse
-//     });
-//  });
-
-
-}
-
-	
 	
 // ----------------------------------------------------
 // GET information about files in a repository - Way 0: REST API 
