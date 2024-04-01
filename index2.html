@@ -10,7 +10,9 @@
 <button id="PUT_text_into_file_RESTAPI" onclick="PUT_text_into_file_RESTAPI()" style="display:block">PUT_text_into_file_RESTAPI</button>
 
 <!--<button id="PUT_text_into_file_Tensorflowjs" onclick="PUT_text_into_file_Tensorflowjs()" style="display:block">PUT_text_into_file_Tensorflowjs</button> -->
-	
+
+<button id="GET_text_from_file_GITHUBAPI" onclick="GET_text_from_file_GITHUBAPI()" style="display:block">GET_text_from_file_GITHUBAPI</button>
+	  
 <button id="GET_text_from_file_RESTAPI" onclick="GET_text_from_file_RESTAPI()" style="display:block">GET_text_from_file_RESTAPI</button>
     
 <button id="GET_text_from_file_Tensorflowjs" onclick="GET_text_from_file_Tensorflowjs()" style="display:block">GET_text_from_file_Tensorflowjs</button>
@@ -93,12 +95,26 @@ async function PUT_text_into_file_Tensorflowjs() {
 
 }
 
+// ----------------------------------------------------
+// GET data from a file - Way 0: GITHUB API
+// ----------------------------------------------------
+async function GET_text_from_file_GITHUBAPI() {
+
+const auth = document.getElementById("auth_id").value;
+
+	// basic auth
+var gh = new GitHub({
+   username: repoOwner,
+   // password: 'NotFoo',
+      token: auth
+})
+
+	console.log(gh);
 
 
+}
 
-
-
-
+	
 	
 // ----------------------------------------------------
 // GET data from a file - Way 0: REST API 
