@@ -54,17 +54,22 @@ async function GET_sha_RESTAPI() {
 
    const auth = document.getElementById("auth_id").value;
 
-var out = await (await fetch(
-    `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`,
-    {
-      method: 'GET',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${auth}`}
-    }
-  )).json();
+let headers = {
+	Accept: 'application/vnd.github+json', 
+	Authorization: `Bearer ${auth}`
+		       "Connection": "keep-alive"};
+	
+	let options = {method : 'GET', 
+		       headers: headers, 
+		       credentials: "include"
+		      };
 
-console.log(out);
+	
+   await fetch(`https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`, options)
+	.then(res => res.json())
+	.then(data => { console.log(data); });
+	.catch(error => { console.log(error); });
+
 }
 
 
