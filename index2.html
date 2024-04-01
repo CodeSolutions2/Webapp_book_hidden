@@ -49,13 +49,13 @@ async function GET_sha_RESTAPI() {
    const auth = document.getElementById("auth_id").value;
 
 let headers = {
-	Accept: 'application/vnd.github+json', 
-	Authorization: `Bearer ${auth}`
-		       "Connection": "keep-alive"};
+	"Accept": 'application/vnd.github+json', 
+	"Authorization": `Bearer ${auth}`,
+	"Connection": "keep-alive"};
 	
-	let options = {method : 'GET', 
-		       headers: headers, 
-		       credentials: "include"
+	let options = {'method' : 'GET', 
+		       'headers': headers, 
+		       'credentials': "include"
 		      };
 
 	
