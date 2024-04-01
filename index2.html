@@ -50,16 +50,19 @@ async function PUT_text_into_file_RESTAPI() {
 
    const auth = document.getElementById("auth_id").value;
 
-   var message = "add another line to file";
+   var message = "commit message";
 
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
    var content = 'add another line to file\n';
+	// btoa(content)
+	// Base64.encode(content)
+	
 
    await fetch(url).then(res => res.json()).then(data => {
 	let sha_val = data.sha; console.log('sha_val: ', sha_val); return sha_val; })
 	.then(async function (sha_val) { 
-		var data = {'branch': 'main', 'message': message, 'content': btoa(content), 'sha': sha_val};
+		var data = {'branch': 'main', 'message': message, 'content': content, 'sha': sha_val};
 		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`}
 		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
 	        var out = await fetch(url, options); return out; })
@@ -126,13 +129,14 @@ var gh = new GitHub({
 	// let filePath = `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`;
 	let filePath = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
-	//GET https://codesolutions2.github.io/repos/undefined/contents/https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data.txt?ref=main
-
+	//GET https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data.txt?ref=main
 	var rep = gh.getRepo(repoOwner, repoName);
 	console.log('rep:', rep);
-
-	rep.getSha(branch, filename).then(data => { console.log(data); });
-
+	// OK
+	
+	
+	rep.getSha(branch, filename).then(res => res).then(data => { console.log(data); });
+	// Error: 401 error making request get https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data.txt?ref=main: ""
 	
 	// Create a gist
 	// var gist = gh.getGist(); // not a gist yet
