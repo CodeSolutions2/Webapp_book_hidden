@@ -7,6 +7,8 @@
     
 <input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 
+<button id="GET_sha_RESTAPI" onclick="GET_sha_RESTAPI()" style="display:block">GET_sha_RESTAPI</button>
+	  
 <button id="PUT_text_into_file_RESTAPI" onclick="PUT_text_into_file_RESTAPI()" style="display:block">PUT_text_into_file_RESTAPI</button>
 
 <!--<button id="PUT_text_into_file_Tensorflowjs" onclick="PUT_text_into_file_Tensorflowjs()" style="display:block">PUT_text_into_file_Tensorflowjs</button> -->
@@ -42,6 +44,32 @@ var filename = "data.txt";
 // ----------------------------------------------------
 // PUT data in a file - Way 0: REST API
 // ----------------------------------------------------
+
+
+
+
+
+	
+async function GET_sha_RESTAPI() {
+
+   const auth = document.getElementById("auth_id").value;
+
+var out = await (await fetch(
+    `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`,
+    {
+      method: 'GET',
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${auth}`}
+    }
+  )).json();
+
+console.log(out);
+}
+
+
+	
+	
 async function PUT_text_into_file_RESTAPI() {
 
    const auth = document.getElementById("auth_id").value;
