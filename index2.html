@@ -131,9 +131,12 @@ var gh = new GitHub({
 	//		 });
 
 
+	var rep = gh.getRepo();
+	console.log('rep:', rep);
 
+	
 	// Create a gist
-	var gist = gh.getGist(); // not a gist yet
+	// var gist = gh.getGist(); // not a gist yet
 	
 	// var data = {
 	 //   public: true,
@@ -280,12 +283,11 @@ async function GET_text_from_file_Tensorflowjs() {
   
 async function get_csvDataset() {
 	
-	const repoOwner = 'CodeSolutions2';
-	const repoName = 'testing_filereader';
 	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
 
 	var url_vec = [];
 	await fetch(url).then(res => res.json()).then(data => {
+		console.log('data: ', data);
 		    data.forEach(file => {
 		      if (file.type === 'file' && file.name.match(/.(csv|txt)$/i)) {
 			url_vec.push(file.download_url);
