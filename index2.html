@@ -50,8 +50,9 @@ async function GET_sha_RESTAPI() {
 
 let headers = {
 	"Accept": 'application/vnd.github+json', 
-	"Authorization": `Bearer ${auth}`,
-	"Connection": "keep-alive"};
+	//"Authorization": `Bearer ${auth}`,
+	//"Connection": "keep-alive"
+};
 	
 	let options = {'method' : 'GET', 
 		       'headers': headers, 
