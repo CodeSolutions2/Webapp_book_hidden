@@ -13,7 +13,7 @@
 
 <button id="GET_text_from_file_GITHUBAPI" onclick="GET_text_from_file_GITHUBAPI()" style="display:block">GET_text_from_file_GITHUBAPI</button>
 	  
-<button id="GET_text_from_file_RESTAPI" onclick="GET_text_from_file_RESTAPI()" style="display:block">GET_text_from_file_RESTAPI</button>
+<button id="GET_repo_file_info_RESTAPI" onclick="GET_repo_file_info_RESTAPI()" style="display:block">GET_repo_file_info_RESTAPI</button>
     
 <button id="GET_text_from_file_Tensorflowjs" onclick="GET_text_from_file_Tensorflowjs()" style="display:block">GET_text_from_file_Tensorflowjs</button>
 
@@ -51,9 +51,12 @@ async function PUT_text_into_file_RESTAPI() {
    const auth = document.getElementById("auth_id").value;
 
    var message = "add another line to file";
-	
-   await (await fetch(
-    `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`,
+
+   var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+   await fetch(url).then(res => res.json()).then(data => {
+	let sha_val = data.sha; console.log('sha_val: ', sha_val); return sha_val; })
+	.then(async function (sha_val) { await fetch(url,
     {
       method: 'PUT',
       headers: {
@@ -62,15 +65,16 @@ async function PUT_text_into_file_RESTAPI() {
       },
       body: JSON.stringify({
         message: message}),
-	    sha: existingFile.sha,
+	    sha: sha_val,
     }
-  )).json();
+  ) })
+	.then(res => { console.log(res); } )
+	.catch(error => { console.log(error); });
+	
+   //await (await ).json();
 
 }
 
-// async function GET_sha_for_file(){
-	
-// }
 
 // 401 Unauthorized: lacks valid authentication credentials for the requested resource
   
@@ -134,6 +138,8 @@ var gh = new GitHub({
 	var rep = gh.getRepo();
 	console.log('rep:', rep);
 
+	rep.getSha(branch, filePath).then(data => { console.log(data); }
+
 	
 	// Create a gist
 	// var gist = gh.getGist(); // not a gist yet
@@ -166,106 +172,33 @@ var gh = new GitHub({
 	
 	
 // ----------------------------------------------------
-// GET data from a file - Way 0: REST API 
+// GET information about files in a repository - Way 0: REST API 
 // ----------------------------------------------------
-async function GET_text_from_file_RESTAPI() {
+async function GET_repo_file_info_RESTAPI() {
 
-const auth = document.getElementById("auth_id").value;
-
-// let url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
-// let url = "https://api.github.com/repos/CodeSolutions2/testing_filereader/data.txt";
-// let url = "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt";
-let url = await get_csvDataset();
-console.log('url: ', url); // https://raw.githubusercontent.com/CodeSolutions2/testing_filereader/main/data.txt
-
-// OR
-
-// To get sha code
-let url_sha = `https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`;
+	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
 	
-
-// For text data: "Content-Type": "application/x-www-form-urlencoded"
-// For binary data: "Content-Type": "multipart/form-data"
-// For image data: "Content-Type": "image/png", "image/jpg"
-// For PUTTING a file to storage: "Content-Type": "application/octet-stream"
-
-// Credential is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’
-
-// The first 3 should be assigned on the server, but Github pages says that these things are already assigned; they should not be in the client request.
-	
-let headers = {
-	       "Access-Control-Allow-Origin": "*", 
-	      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-	      "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization",
-	      "Content-Type": "application/x-www-form-urlencoded",
-	      // "Access-Control-Allow-Credentials": true,
-	       Accept: 'application/vnd.github+json',
-	       Authorization: `Bearer ${auth}`,
-	       "Connection": "keep-alive"
-	      };
-
-let headers2 = new Headers(headers);
-
-// https://web.dev/articles/introduction-to-fetch
-// Types of mode: 
-// "same-origin" = only succeeds for requests for assets on the same origin, all other requests will reject. Got this error with this setting: Request failed TypeError: NetworkError when attempting to fetch resource.
-	
-// "cors" = will allow requests for assets on the same-origin and other origins which return the appropriate CORs headers.
-	
-// "cors-with-forced-preflight" = will always perform a preflight check before making the actual request.
-	
-// "no-cors" = is intended to make requests to other origins that do not have CORS headers and result in an opaque response, but as stated, this isn't possible in the window global scope at the moment. Using mode: "no-cors" will give you an opaque response meaning that the body will be empty
-
-let options = {method : 'GET', 
-	       headers: headers2, 
-	       //    mode: 'same-origin', 
-	       cache: "no-cache", 
-	       //  credentials: "include",
-	       // 'credentials': "same-origin"
-	       redirect: "follow", 
-	       //referrerPolicy: "origin"
-	      };
-  
-	//const existingFile = await (await fetch(url, options)).json();
-	//console.log("existingFile: ", existingFile);
-	
-	// OR
-
-	// Webscrapping format: it can return html
-	// const existingFile1 = await fetch(url, options);
- 	// console.log("existingFile1: ", existingFile1);
-
-	// var out = await existingFile1.text();
-	// console.log("out: ", out);
-
-	// OR
-
-	//
-	//await fetch(url, options)
-	//		    .then(function(response) {return response.text(); })
-	//		    .then(function(text) { console.log('Request successful', text); })
-	//		    .catch(function(error) { console.log('Request failed', error) });
-
-	// OR
-
-	await fetch(url_sha, options)
-			    .then(function(response) {return response.json(); })
-			    .then(function(response) { console.log('Request successful', response); })
-		//.then(function(response) { return dispatch({type: "GET_CALL", response: response}); })
-			    .catch(function(error) { console.log('Request failed', error) });
-
-
-	// OR
-
-	// await fetch(url, options)
-	//.then(res => res.json())
-	//.then(data => { console.log(data); })
-	//.catch(error => { console.log(error); });
-
+	return await fetch(url).then(res => res.json()).then(data => {
+	console.log('data: ', data);
+	// data contains: { self: "https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data.txt?ref=main", 
+	// git: "https://api.github.com/repos/CodeSolutions2/testing_filereader/git/blobs/c4889a157c4ca8945b75a0c1b00c84c2f6d448de", 
+	// html: "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt" }
+	// download_url: "https://raw.githubusercontent.com/CodeSolutions2/testing_filereader/main/data.txt"
+	// git_url: "https://api.github.com/repos/CodeSolutions2/testing_filereader/git/blobs/c4889a157c4ca8945b75a0c1b00c84c2f6d448de"
+	// html_url: "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt"
+	// name: "data.txt"
+	// path: "data.txt"
+	// sha: "c4889a157c4ca8945b75a0c1b00c84c2f6d448de"
+	// size: 60
+	// type: "file"
+	// url: "https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data.txt?ref=main"
+	return data; });
 }
+	
 // ----------------------------------------------------
-// Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://github.com/api/v3/repos/CodeSolutions2/testing_filereader/git/trees/main:data.txt. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 404.
 
+
+	
 
 // ----------------------------------------------------
 // GET data in a file - Way 1: Tensorflow.js
