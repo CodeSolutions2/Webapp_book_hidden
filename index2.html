@@ -61,7 +61,7 @@ let headers = {
 	
    await fetch(`https://github.com/api/v3/repos/${repoOwner}/${repoName}/git/trees/main:${filename}`, options)
 	.then(res => res.json())
-	.then(data => { console.log(data); });
+	.then(data => { console.log(data); })
 	.catch(error => { console.log(error); });
 
 }
