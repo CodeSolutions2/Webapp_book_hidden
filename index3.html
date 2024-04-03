@@ -62,8 +62,9 @@ async function PUT_text_into_file_RESTAPI() {
    await fetch(url).then(res => res.json()).then(data => {
 	let sha_val = data.sha; console.log('sha_val: ', sha_val); return sha_val; })
 	.then(async function (sha_val) { 
-		var data = {'branch': 'main', 'message': message, 'content': content, 'sha': sha_val};
-		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`}
+		// var data = {'branch': 'main', 'message': message, 'content': content, 'sha': sha_val, "access_token": auth};
+		var data = {"message":"a new commit message","committer":{"name":"App name","email":"App email"},"content": content,"sha": sha_val};
+		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"}
 		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
 	        var out = await fetch(url, options); return out; })
 	.then(res => { console.log(res); } )
