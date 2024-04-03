@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    
+    <h1 style='text-align: center; margin-bottom: -35px;'>Ask the robot</h1>
+
+    <br><br>
+
+    <h3>Prompt:</h3>
+    <input id="prompt" type="text" value="" placeholder="Enter prompt here" rows="1" cols="100">
+
+    <br><br>
+
+    <h3>Input OpenAI key:</h3>
+    <input id="apikey" type="text" value="" placeholder="Enter OpenAI key here" rows="1" cols="50">
+ <br><br>
+
+      <button id="Run_Selection" onclick="run()">Run Selection</button>
+      
+      <br><br>
+      
+      <label id="Response_label" style="display:none">Response</label>
+      <br>
+      <textarea id="Response" rows="4" cols="100" placeholder="Response" style="display:block"></textarea>
+      <br>
+
+<style type="text/css">textarea#Response {
+      background-color: #b8d6ba;
+      border: 0.5px grey;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;}</style>
+
+
+
+    <script>
+    // -----------------------------------
+
+async function run() {
+
+      const prompt = document.getElementById("prompt").value;
+      const OPENAI_API_KEY = document.getElementById("apikey").value;
+
+      var model_name = 'gpt-3.5-turbo';
+      var temperature = 0;
+
+      // ------------------------------------------
+        var system_content = "You are a helpful assistant"
+        var assistant_content = "Respond concisely"
+        var messages = [{"role": "system", "content": system_content}, {"role": "user", "content": prompt}, {"role": "assistant", "content": assistant_content}];
+        var data = {"model": model_name, 'messages': messages, 'temperature': temperature};
+        var url = 'https://api.openai.com/v1/chat/completions'
+        var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY}
+        var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+        // ------------------------------------------
+        try {
+          // Print text part of JSON response only with user message
+          const text_out = await fetch(url, options).then(res => res.json()).then(res => {document.getElementById("Response").innerHTML = `The OpenAI model ${model_name} response is : ${JSON.parse(JSON.stringify(res))['choices'][0]['message']['content']}`; return JSON.parse(JSON.stringify(res))['choices'][0]['message']['content']})
+        } catch (error) {
+          document.getElementById("Errorout").innerHTML = error;
+        }
+
+}
+      
+    // -----------------------------------
+
+  </script>
+  </body>
+</html>
+
+      
