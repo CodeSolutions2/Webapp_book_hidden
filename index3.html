@@ -82,6 +82,8 @@ async function PUT_text_into_file_RESTAPI() {
 // ----------------------------------------------------
 async function GET_text_from_file_RESTAPI() {
 
+	const auth = document.getElementById("auth_id").value;
+	
 	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
 	var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"}
