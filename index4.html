@@ -127,7 +127,7 @@ async function PUT_create_a_file_RESTAPI1() {
    const octokit = new Octokit({ auth: auth })
 		
 	return await octokit.request(`PUT /repos/${repoOwner}/${repoName}/contents/data_040424.txt`, {
-	  owner: repoName,
+	  owner: repoOwner,
 	  repo: repoName,
 	  path: 'data_040424.txt',
 	  message: message,
