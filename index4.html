@@ -9,12 +9,8 @@
 
 <button id="PUT_add_to_a_file_RESTAPI" onclick="PUT_add_to_a_file_RESTAPI()" style="display:block">PUT_add_to_a_file_RESTAPI</button>
 
-<button id="PUT_create_a_file_RESTAPI" onclick="PUT_create_a_file_RESTAPI()" style="display:block">PUT_create_a_file_RESTAPI</button>
-
 <button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
-	  
-<button id="GET_repo_file_info_RESTAPI" onclick="GET_repo_file_info_RESTAPI()" style="display:block">GET_repo_file_info_RESTAPI</button>
- 
+
 <!-- <input type="file" id="text_file_input" accept=".txt"> -->
 	  
     
@@ -62,35 +58,6 @@ async function PUT_add_to_a_file_RESTAPI() {
 	   		.catch(error => { console.log(error); });
 
 }
-
-
-
-	
-// ----------------------------------------------------
-// PUT create a file - Way 0: REST API (WORKS!)
-// Can only write to a public repository, can not write to a private repository even if the key grants access
-// https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#create-or-update-file-contents
-// ----------------------------------------------------
-async function PUT_create_a_file_RESTAPI() {
-
-   const auth = document.getElementById("auth_id").value;
-   var message = "a new commit message";
-   var content = 'add another line to file\n';
-
-   // https://developer.mozilla.org/en-US/docs/Web/API/btoa
-   var content_encoded0 = btoa(content);
-   console.log("content_encoded0: ", content_encoded0);
-
-// PUT into a new file
-var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/data_040424.txt`;
-var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0};
-var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
-var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
-return await fetch(url, options)
-		.then(res => { console.log(res); return res; })
-		.catch(error => { console.log(error); });
-
-}
   
 // ----------------------------------------------------
 
@@ -123,35 +90,6 @@ async function func2() {
    console.log("content_decoded0: ", content_decoded0);
 			});
 	
-}
-	
-// ----------------------------------------------------
-
-
-	
-
-// ----------------------------------------------------
-// GET information about files in a repository - Way 0: REST API (WORKS!)
-// ----------------------------------------------------
-async function GET_repo_file_info_RESTAPI() {
-
-	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
-	
-	return await fetch(url).then(res => res.json()).then(data => {
-	console.log('data: ', data);
-	// data contains: { self: "https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data.txt?ref=main", 
-	// git: "https://api.github.com/repos/CodeSolutions2/testing_filereader/git/blobs/c4889a157c4ca8945b75a0c1b00c84c2f6d448de", 
-	// html: "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt" }
-	// download_url: "https://raw.githubusercontent.com/CodeSolutions2/testing_filereader/main/data.txt"
-	// git_url: "https://api.github.com/repos/CodeSolutions2/testing_filereader/git/blobs/c4889a157c4ca8945b75a0c1b00c84c2f6d448de"
-	// html_url: "https://github.com/CodeSolutions2/testing_filereader/blob/main/data.txt"
-	// name: "data.txt"
-	// path: "data.txt"
-	// sha: "c4889a157c4ca8945b75a0c1b00c84c2f6d448de"
-	// size: 60
-	// type: "file"
-	// url: "https://api.github.com/repos/CodeSolutions2/testing_filereader/contents/data.txt?ref=main"
-	return data; });
 }
 	
 // ----------------------------------------------------
