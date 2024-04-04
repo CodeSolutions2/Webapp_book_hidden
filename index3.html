@@ -24,12 +24,6 @@
 	  
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 
-<script src="https://unpkg.com/github-api/dist/GitHub.bundle.min.js"></script>
-
-<script type="module">
-  import { Octokit } from "https://esm.sh/@octokit/core";
-</script>
-	  
 <script>
 
 // ----------------------------------------------------
@@ -65,7 +59,6 @@ async function PUT_text_into_file_RESTAPI() {
    await fetch(url).then(res => res.json()).then(data => {
 	let sha_val = data.sha; console.log('sha_val: ', sha_val); return sha_val; })
 	.then(async function (sha_val) { 
-		// var data = {'branch': 'main', 'message': message, 'content': content, 'sha': sha_val, "access_token": auth};
 		var data = {"message": message, "committer":{"name":"App name","email":"App email"},"content": content_encoded0, "sha": sha_val};
 		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"}
 		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
@@ -81,7 +74,7 @@ async function PUT_text_into_file_RESTAPI() {
 	
 
 // ----------------------------------------------------
-// GET data in a file - Way 0: REST API
+// GET data in a file - Way 0: REST API (WORKS!)
 // https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#get-repository-content
 // ----------------------------------------------------
 async function GET_text_from_file_RESTAPI() {
@@ -105,8 +98,6 @@ async function func2() {
 		.then(data => {console.log('data.content: ', data.content); 
 			var content_decoded0 = atob(data.content);
    console.log("content_decoded0: ", content_decoded0);
-   var content_decoded1 = Base64.decode(data.content);
-   console.log("content_encoded1: ", content_encoded1);
 			});
 	
 }
@@ -117,7 +108,7 @@ async function func2() {
 	
 
 // ----------------------------------------------------
-// GET information about files in a repository - Way 0: REST API 
+// GET information about files in a repository - Way 0: REST API (WORKS!)
 // ----------------------------------------------------
 async function GET_repo_file_info_RESTAPI() {
 
@@ -146,7 +137,7 @@ async function GET_repo_file_info_RESTAPI() {
 	
 
 // ----------------------------------------------------
-// GET data in a file - Way 1: Tensorflow.js
+// GET data in a file - Way 1: Tensorflow.js (WORKS!)
 // https://js.tensorflow.org/api/1.0.0/
 // ----------------------------------------------------
 async function GET_text_from_file_Tensorflowjs() {
