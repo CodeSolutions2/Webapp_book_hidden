@@ -9,7 +9,7 @@
 	  
 <button id="PUT_text_into_file_RESTAPI" onclick="PUT_text_into_file_RESTAPI()" style="display:block">PUT_text_into_file_RESTAPI</button>
 
-<button id="GET_text_from_file_RESTAPI" onclick="GET_text_from_file_RESTAPI()" style="display:block">GET_text_from_file_RESTAPI</button>
+<button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
 	  
 <button id="GET_repo_file_info_RESTAPI" onclick="GET_repo_file_info_RESTAPI()" style="display:block">GET_repo_file_info_RESTAPI</button>
     
@@ -76,7 +76,7 @@ async function PUT_text_into_file_RESTAPI() {
 }
   
 // ----------------------------------------------------
-
+// '403 Forbidden' error when you try to access an API and do not have the permission to perform the actions required by the API.
 
 	
 
@@ -96,15 +96,19 @@ async function GET_text_from_file_RESTAPI() {
 	return await fetch(url, options).then(res => res.json())
 		.then(data => { 
 			// console.log('data: ', data); 
-			       console.log('data.content: ', data.content); 
+			return data; })
+		.catch(error => { console.log(error); });
+}
 
+async function func2() {
+	await GET_text_from_file_RESTAPI()
+		.then(data => {console.log('data.content: ', data.content); 
 			var content_decoded0 = atob(data.content);
    console.log("content_decoded0: ", content_decoded0);
    var content_decoded1 = Base64.decode(data.content);
    console.log("content_encoded1: ", content_encoded1);
-			
-			       return data; })
-		.catch(error => { console.log(error); });
+			});
+	
 }
 	
 // ----------------------------------------------------
