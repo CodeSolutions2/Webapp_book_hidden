@@ -14,17 +14,13 @@
 <button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
 	  
 <button id="GET_repo_file_info_RESTAPI" onclick="GET_repo_file_info_RESTAPI()" style="display:block">GET_repo_file_info_RESTAPI</button>
-    
-<button id="GET_text_from_file_Tensorflowjs" onclick="GET_text_from_file_Tensorflowjs()" style="display:block">GET_text_from_file_Tensorflowjs</button>
-
+ 
 <!-- <input type="file" id="text_file_input" accept=".txt"> -->
 	  
     
 <!-- View results -->
 <div id="output" style="font-family:courier;font-size:24px;height:300px"></div>
 
-	  
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 
 <script>
 
@@ -161,83 +157,6 @@ async function GET_repo_file_info_RESTAPI() {
 // ----------------------------------------------------
 
 
-	
-
-// ----------------------------------------------------
-// GET data in a file - Way 1: Tensorflow.js (WORKS!)
-// https://js.tensorflow.org/api/1.0.0/
-// ----------------------------------------------------
-async function GET_text_from_file_Tensorflowjs() {
-
-	await get_csvDataset()
-		.then(async function(get_csvDataset_URLblob) { const csvDataset = await tf.data.csv(get_csvDataset_URLblob, { columnConfigs: { ys: {isLabel: true} } }); return csvDataset; })
-		.then(async function(csvDataset) { const arr = csvDataset_2_array(csvDataset); return arr; })
-		.then(async function(arr) { await generateTable_dynamically(arr); })
-
-}
-
-  
-async function get_csvDataset() {
-	
-	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
-
-	var url_vec = [];
-	await fetch(url).then(res => res.json()).then(data => {
-		console.log('data: ', data);
-		    data.forEach(file => {
-		      if (file.type === 'file' && file.name.match(/.(csv|txt)$/i)) {
-			url_vec.push(file.download_url);
-		      }
-		    });
-		  }).catch(error => { outp.innerHTML += error; });
-
-	const get_csvDataset_URLblob = url_vec[0];
-	console.log('get_csvDataset_URLblob: ', get_csvDataset_URLblob);
-    
-	return get_csvDataset_URLblob;
-}
-
-	
-async function csvDataset_2_array(csvDataset){
-
-	let arr = [];
-	
-	const tensors = await csvDataset.toArray();
-	tensors.forEach(async function(rowdata, index) {
-
-		let col0 = Object.values(rowdata.xs);
-		arr.push(col0);
-		
-	});  // end of forEach
-
-	return arr;
-}
-
-async function generateTable_dynamically(arr) {
-	const tbl = document.createElement("table");
-	const tblBody = document.createElement("tbody");
-
-	// Create row cells dynamically
-	for (let i=0; i < arr.length; i++){
-		// create a table row
-		const row = document.createElement("tr");
-
-		for (let j=0; j < arr[0].length; j++){
-			const cell = document.createElement("td");
-			const cellText = document.createTextNode(`${arr[i][j]}`);
-			cell.appendChild(cellText);
-			row.appendChild(cell);
-		}
-
-		// add a row to the end of the table
-		tblBody.appendChild(row);
-	}
-	tbl.appendChild(tblBody);
-
-	document.body.appendChild(tbl);
-  }
-	
-// ----------------------------------------------------
   
 </script>
 
