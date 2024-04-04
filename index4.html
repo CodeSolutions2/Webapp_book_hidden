@@ -7,10 +7,7 @@
     
 <input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 
-<input id="openssl_private_key" type="text" value="" placeholder="openssl_private_key" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
-	  
 <button id="PUT_create_a_file_RESTAPI" onclick="PUT_create_a_file_RESTAPI()" style="display:block">PUT_create_a_file_RESTAPI</button>
-
 
 <button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
 	  
@@ -36,34 +33,6 @@ const outp = document.getElementById('output');
 var repoOwner = "CodeSolutions2";
 var repoName = "testing_filereader";
 var filename = "data.txt";
-
-
-// ----------------------------------------------------
-// Test encryption/decryption
-// ----------------------------------------------------
-function encryptData(){
-
-   const OPENSSL_PRIVATE_OR_PUBLIC_KEY = document.getElementById("openssl_private_key").value;
-	
-   // Create the encryption object and set the key.
-   var crypt = new JSEncrypt();
-   crypt.setKey(OPENSSL_PRIVATE_OR_PUBLIC_KEY); //You can use also setPrivateKey and setPublicKey, they are both alias to setKey
-
-   //Eventhough the methods are called setPublicKey and setPrivateKey, remember
-   //that they are only alias to setKey, so you can pass them both a private or
-   //a public openssl key, just remember that setting a public key allows you to only encrypt.
-
-   var text = 'test';
-	
-   // Encrypt the data with the public key.
-   var enc = crypt.encrypt(text);
-   console.log("enc: ", enc);
-	
-   // Now decrypt the crypted text with the private key.
-   var dec = crypt.decrypt(enc);
-   console.log("dec: ", dec);
-  
-}
 
 	
 	
