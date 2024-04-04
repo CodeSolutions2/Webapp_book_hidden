@@ -10,6 +10,7 @@
 <input id="openssl_private_key" type="text" value="" placeholder="openssl_private_key" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 	  
 <button id="PUT_create_a_file_RESTAPI" onclick="PUT_create_a_file_RESTAPI()" style="display:block">PUT_create_a_file_RESTAPI</button>
+<button id="PUT_create_a_file_RESTAPI1" onclick="PUT_create_a_file_RESTAPI1()" style="display:block">PUT_create_a_file_RESTAPI1</button>
 
 <button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
 	  
@@ -26,8 +27,13 @@
 	  
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
-	
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script> -->
+
+
+<!-- https://www.jsdelivr.com/package/npm/@octokit/core -->
+<script src="https://cdn.jsdelivr.net/npm/@octokit/core@6.1.1/dist-src/index.min.js"></script>
+	  
+<script src="https://cdn.jsdelivr.net/npm/keypair@1.0.4/index.min.js"></script>
 
 <script>
 
@@ -106,6 +112,34 @@ return await fetch(url, options)
 		.then(res => { console.log(res); return res; })
 		.catch(error => { console.log(error); });
 
+}
+
+
+	
+async function PUT_create_a_file_RESTAPI1() {
+
+   const auth = document.getElementById("auth_id").value;
+   var message = "a new commit message";
+   var content = 'add another line to file\n';
+   var content_encoded0 = btoa(content);
+   console.log("content_encoded0: ", content_encoded0);
+	
+   const octokit = new Octokit({ auth: auth })
+		
+	return await octokit.request(`PUT /repos/${repoOwner}/${repoName}/contents/data_040424.txt`, {
+	  owner: repoName,
+	  repo: repoName,
+	  path: 'data_040424.txt',
+	  message: message,
+	  committer: {
+	    name: 'App name',
+	    email: 'App email'
+	  },
+	  content: content_encoded0,
+	  headers: {
+	    'X-GitHub-Api-Version': '2022-11-28'
+	  }
+	});
 }
   
 // ----------------------------------------------------
