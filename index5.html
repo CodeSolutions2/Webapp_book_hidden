@@ -101,12 +101,10 @@ async function PUT_add_to_a_file_RESTAPI() {
 		   //  ----------------------------------------
 		   
 		   // Encode raw_text with respect to RSA publicKey (so encoded data is only visible to the public, to protect user's data)
-		   			const textBuffer = new TextEncoder().encode(raw_text);
-		   			console.log('textBuffer:', textBuffer); 
-		   			return textBuffer; })
-	.then(async function (textBuffer) {let data_encoded1 = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer)
-	.then(async function (encrypted) => {
-		console.log("Text encrypted:", encrypted);
+		   const textBuffer = new TextEncoder().encode(raw_text); console.log('textBuffer:', textBuffer);  return textBuffer; })
+	.then(async function (textBuffer) {let data_encoded1 = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer); return data_encoded1; })
+	.then(async function (data_encoded1) => {
+		console.log("Text encrypted:", data_encoded1);
 		
 		// Encode protected data into github's encoded format
 		let content_encoded0 = btoa(data_encoded1);
