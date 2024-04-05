@@ -73,8 +73,10 @@ async function PUT_add_to_a_file_RESTAPI() {
    return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
 	   .then((keyPair) => { privateKey_obj = keyPair.privateKey; publicKey_obj = keyPair.publicKey; })
 	   // update the global variables privateKey_obj and publicKey_obj
-	   .then(async function() { await GET_text_from_file_RESTAPI(); }
-	   .then(async function (data) { // console.log('data:', data);
+	   .then(async function() { await GET_text_from_file_RESTAPI(); })
+	   .then(async function (data) {
+		   
+		   // console.log('data:', data);
 
 		   		       //  ----------------------------------------
 				       
