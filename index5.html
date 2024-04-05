@@ -48,13 +48,13 @@ async function PUT_add_to_a_file_RESTAPI() {
 	   //.then(data => { let sha_val0 = data.sha; console.log('sha_val0: ', sha_val0); return sha_val0; })
 	   //.then(async function (sha_val0) { 
 					// let tot =[]; 
-					    await GET_text_from_file_RESTAPI(); 
+					    await GET_text_from_file_RESTAPI()
 					   // tot.push(atob(data0.content)); 
 					    //console.log('data0:', data0);
 					    //tot.push(sha_val0);
 					    //console.log('tot:', tot);
 					    //return tot; 
-					   })   
+					  // })   
 	   .then(async function (data) { console.log('data:', data);
 				       let sha_val = data.sha; 
 				       console.log('sha_val:', sha_val); 
