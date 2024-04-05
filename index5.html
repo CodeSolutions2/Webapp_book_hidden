@@ -45,8 +45,11 @@ async function PUT_add_to_a_file_RESTAPI() {
    return await fetch(url)
 	   .then(res => res.json())
 	   .then(data => { let sha_val0 = data.sha; console.log('sha_val0: ', sha_val0); return sha_val0; })
-	   .then(async function (sha_val0) { let tot =[]; var data = await GET_text_from_file_RESTAPI(); tot.push(atob(data.content)); return tot.push(sha_val0); })   
-	   .then(async function (tot) { let sha_val = tot.pop; 
+	   .then(async function (sha_val0) { let tot =[]; let data0 = await GET_text_from_file_RESTAPI(); tot.push(atob(data0.content)); 
+					    console.log('data0:', data0);
+					    return tot.push(sha_val0); })   
+	   .then(async function (tot) { console.log('tot:', tot);
+				       let sha_val = tot.pop; 
 				       console.log('sha_val:', sha_val); 
 				       let content = 'add another line to file\n';
 				      tot.push(content); 
