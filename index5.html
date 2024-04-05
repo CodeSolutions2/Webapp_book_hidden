@@ -34,29 +34,22 @@ var filename = "data.txt";
 
 var message = "a new commit message";
 
+var privateKey_obj = {}; 
+var publicKey_obj = keyPair.publicKey;
+
 
 
 // ----------------------------------------------------
 // Generate RSA key pair
 // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
 // ----------------------------------------------------
-function generateRSAkey() {
+async function generateRSAkey() {
 	
-	return window.crypto.subtle.generateKey(
-	    {
-	        name: "RSA-OAEP",
-	        modulusLength: 2048,
-	        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-	        hash: {name: "SHA-256"}
-	    },
-	    true,
-	    ["encrypt", "decrypt"]
-	).then((keyPair) => {
-	    console.log("RSA key pair generated:", keyPair);
-	    return keyPair;
-	}).catch((error) => {
-	    console.error("Error generating RSA key pair:", error);
-	});
+	return window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
+		.then((keyPair) => { console.log("RSA key pair generated:", keyPair); var privateKey_obj = keyPair.privateKey; var publicKey_obj = keyPair.publicKey; localStorage.setItem('privateKey_obj', privateKey_obj); localStorage.setItem('publicKey_obj', publicKey_obj);
+		   const exported = await window.crypto.subtle.exportKey("pkcs8", publicKey_obj).then(res => res).then(res => {return res; }); const publicExportedKeyBuffer = new Uint8Array(exported); let publicExportKeyOutput = `[${publicExportedKeyBuffer}]`; console.log('publicExportKeyOutput:', publicExportKeyOutput); localStorage.setItem('publicExportKeyOutput', publicExportKeyOutput);
+	})
+	.catch((error) => { console.error("Error generating RSA key pair:", error); });
 }
   
 // ----------------------------------------------------
@@ -77,26 +70,12 @@ async function PUT_add_to_a_file_RESTAPI() {
    // PUT into an existing file
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
-   return await GET_text_from_file_RESTAPI()
+   return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"]).
+	   .then((keyPair) => { privateKey_obj = keyPair.privateKey; publicKey_obj = keyPair.publicKey; })
+	   // update the global variables privateKey_obj and publicKey_obj
+	   .then(async function() { await GET_text_from_file_RESTAPI(); }
 	   .then(async function (data) { // console.log('data:', data);
 
-		   var keyPair = await generateRSAkey();
-
-		   //  ----------------------------------------
-		   
-		   var privateKey_obj = keyPair.privateKey;
-		   var publicKey_obj = keyPair.publicKey;
-
-		   //  ----------------------------------------
-		   
-		   const exported = await window.crypto.subtle.exportKey("pkcs8", privateKey_obj);
-  const exportedKeyBuffer = new Uint8Array(exported);
-
-  //const exportKeyOutput = document.querySelector(".exported-key");
-  //exportKeyOutput.textContent = `[${exportedKeyBuffer}]`;
-		   let exportKeyOutput = `[${exportedKeyBuffer}]`;
-		   console.log('exportKeyOutput:', exportKeyOutput);
-		   
 		   		       //  ----------------------------------------
 				       
 		   		       let data_github_encoded_format = data.content;
@@ -126,8 +105,12 @@ async function PUT_add_to_a_file_RESTAPI() {
 		   			// Encode raw_text with respect to RSA publicKey (so encoded data is only visible to the public, to protect user's data)
 		   			const textBuffer = new TextEncoder().encode(raw_text);
 		   			console.log('textBuffer:', textBuffer); 
-		   
-		   			let data_encoded1 = window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer).then((encrypted) => {console.log("Text encrypted:", encrypted); }).catch((error) => { console.error("Error encrypting text:", error); });
+		   			return textBuffer;
+	   })
+	.then(async function (textBuffer) {
+		
+		   			let data_encoded1 = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer)
+						.then((encrypted) => {console.log("Text encrypted:", encrypted); })
 
 		   			//  ----------------------------------------
 		   
