@@ -7,6 +7,8 @@
     
 <input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 
+<input id="username" type="text" value="" placeholder="username" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+	  
 <button id="PUT_add_to_a_file_RESTAPI" onclick="PUT_add_to_a_file_RESTAPI()" style="display:block">PUT_add_to_a_file_RESTAPI</button>
 
 <button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
@@ -38,40 +40,32 @@ var message = "a new commit message";
 async function PUT_add_to_a_file_RESTAPI() {
 
    const auth = document.getElementById("auth_id").value;
-   
 
+   const username = document.getElementById("username").value;
+   
    // PUT into an existing file
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
-	 //await fetch(url)
-	   //.then(res => res.json())
-	   //.then(data => { let sha_val0 = data.sha; console.log('sha_val0: ', sha_val0); return sha_val0; })
-	   //.then(async function (sha_val0) { 
-					// let tot =[]; 
-					    
-					   // tot.push(atob(data0.content)); 
-					    //console.log('data0:', data0);
-					    //tot.push(sha_val0);
-					    //console.log('tot:', tot);
-					    //return tot; 
-					  // })  
-	
    return await GET_text_from_file_RESTAPI()
-	   .then(async function (data) { console.log('data:', data);
-				       let sha_val = data.sha; 
-				       console.log('sha_val:', sha_val); 
+	   .then(async function (data) { // console.log('data:', data);
+				       
 				       let data_encoded0 = data.content;
-				       let data_decoded0 = atob(data_encoded0);
-				       console.log('data already in file decoded:', data_decoded0);
 
-				       let content = 'add another line to file\n';
+		                       // Data that is visible in file to public (this is text now, but it should be RSA encrypted)
+				       let data_decoded0 = atob(data_encoded0);
+				       // console.log('data already in file decoded:', data_decoded0);
+
+		                       // Decode with respect to RSA
+		                       
+
+				       let content = `${username}\n`;
 				       var content_decoded_new = data_decoded0.concat(content);
-				       console.log('content_decoded_new:', content_decoded_new); 
+				       // console.log('content_decoded_new:', content_decoded_new); 
 					
 				       let content_encoded0 = btoa(content_decoded_new);
-				       console.log("content_encoded0: ", content_encoded0);
+				       // console.log("content_encoded0: ", content_encoded0);
 				       
-			var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
+			var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": data.sha};
 			var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
 			var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
 		   var out = await fetch(url, options); return out; })
@@ -106,7 +100,8 @@ async function GET_text_from_file_RESTAPI() {
 
 async function func2() {
 	await GET_text_from_file_RESTAPI()
-		.then(data => {console.log('data.content: ', data.content); 
+		.then(data => {
+			console.log('data.content: ', data.content); 
 			var content_decoded0 = atob(data.content);
    console.log("content_decoded0: ", content_decoded0);
 			});
