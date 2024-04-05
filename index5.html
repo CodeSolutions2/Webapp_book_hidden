@@ -11,9 +11,9 @@
 	  
 <button id="PUT_add_to_a_file_RESTAPI" onclick="PUT_add_to_a_file_RESTAPI()" style="display:block">PUT_add_to_a_file_RESTAPI</button>
 
-<button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
+<button id="PUT_add_to_a_file_RESTAPI_crypto" onclick="PUT_add_to_a_file_RESTAPI_crypto()" style="display:block">PUT_add_to_a_file_RESTAPI_crypto</button>
 	  
-<!-- <button id="generateRSAkey" onclick="generateRSAkey()" style="display:block">generateRSAkey</button> -->
+<button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
 
 <!-- <input type="file" id="text_file_input" accept=".txt"> -->
 	  
@@ -40,13 +40,54 @@ var publicKey_obj = {};
 var sha_val = "";
 var raw_text = "";
 
+
+// ----------------------------------------------------
+
+	
+async function PUT_add_to_a_file_RESTAPI() {
+
+   const auth = document.getElementById("auth_id").value;
+
+   const username = document.getElementById("username").value;
+   
+   // PUT into an existing file
+   var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+   return await GET_text_from_file_RESTAPI()
+	   .then(async function (out) {
+		   sha_val = out.sha;
+		   let data_github_encoded_format = out.content;
+		   
+		   // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
+		   let data_decoded0 = atob(data_github_encoded_format);
+		   console.log('data already in file decoded:', data_decoded0);
+		   
+		   let content = `${username}\n`;
+		   
+		   // Add new content to file
+		   raw_text = data_decoded0.concat(content); // without using RSA encryption
+		   console.log('raw_text:', raw_text); 
+		   
+		// Encode protected data into github's encoded format
+		let content_encoded0 = btoa(raw_text);
+		console.log("content_encoded0: ", content_encoded0);
+		
+		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
+		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
+		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
+		var out1 = await fetch(url, options); return out1; })
+	   		.then(res => { console.log(res); } )
+	   		.catch(error => { console.log(error); });
+
+}
+
 	
 // ----------------------------------------------------
 // PUT add to an existing file - Way 0: REST API
 // Can only write to a public repository, can not write to a private repository even if the key grants access
 // https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#create-or-update-file-contents
 // ----------------------------------------------------
-async function PUT_add_to_a_file_RESTAPI() {
+async function PUT_add_to_a_file_RESTAPI_crypto() {
 
    const auth = document.getElementById("auth_id").value;
 
@@ -92,7 +133,7 @@ async function PUT_add_to_a_file_RESTAPI() {
 		console.log("data_encoded_arrayBuffer:", data_encoded_arrayBuffer);
 		
 		const uint8Array = new Uint8Array(data_encoded_arrayBuffer);
-		const textDecoder = new TextDecoder();
+		const textDecoder = new TextDecoder('utf-8');
 		const data_encoded1_String = textDecoder.decode(uint8Array);
 		console.log("data_encoded1_String:", data_encoded1_String);
 		
