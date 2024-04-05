@@ -28,7 +28,7 @@ var repoOwner = "CodeSolutions2";
 var repoName = "testing_filereader";
 var filename = "data.txt";
 
-	
+var message = "a new commit message";
 	
 // ----------------------------------------------------
 // PUT add to an existing file - Way 0: REST API
@@ -38,21 +38,24 @@ var filename = "data.txt";
 async function PUT_add_to_a_file_RESTAPI() {
 
    const auth = document.getElementById("auth_id").value;
-   var message = "a new commit message";
-   var content = 'add another line to file\n';
-
-   // https://developer.mozilla.org/en-US/docs/Web/API/btoa
-   var content_encoded0 = btoa(content);
-   console.log("content_encoded0: ", content_encoded0);
+   
 
    // PUT into an existing file
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
-   return await fetch(url).then(res => res.json()).then(data => {
-	   let sha_val = data.sha; console.log('sha_val: ', sha_val); return sha_val; })
-	   .then(async function (sha_val) { 
-		   var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
-		   var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
-		   var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
+   return await fetch(url)
+	   .then(res => res.json())
+	   .then(data => { let sha_val = data.sha; console.log('sha_val: ', sha_val); return sha_val; })
+	   .then(async function (tot) { let tot =[]; var data = await GET_text_from_file_RESTAPI(); tot.push(atob(data.content)); return tot.push(sha_val); })   
+	   .then(async function (tot) { let sha_val = tot.pop; 
+				       console.log('sha_val:', sha_val); 
+				       let content = 'add another line to file\n';
+				      tot.push(content); 
+				       console.log('tot:', tot);
+				       let content_encoded0 = btoa(tot);
+				       console.log("content_encoded0: ", content_encoded0);
+				var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
+			var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
+			var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
 		   var out = await fetch(url, options); return out; })
 	   		.then(res => { console.log(res); } )
 	   		.catch(error => { console.log(error); });
