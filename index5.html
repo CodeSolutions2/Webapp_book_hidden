@@ -105,7 +105,7 @@ async function PUT_add_to_a_file_RESTAPI() {
 		   			console.log('textBuffer:', textBuffer); 
 		   			return textBuffer; })
 	.then(async function (textBuffer) {let data_encoded1 = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer)
-	.then((encrypted) => {
+	.then(async function (encrypted) => {
 		console.log("Text encrypted:", encrypted);
 		
 		// Encode protected data into github's encoded format
