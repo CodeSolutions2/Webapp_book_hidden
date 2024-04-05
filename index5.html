@@ -60,16 +60,18 @@ async function PUT_add_to_a_file_RESTAPI() {
 	   .then(async function (data) { console.log('data:', data);
 				       let sha_val = data.sha; 
 				       console.log('sha_val:', sha_val); 
-					let data_encoded0 = data.content;
+				       let data_encoded0 = data.content;
 				       let data_decoded0 = atob(data_encoded0);
-					console.log('data already in file decoded:', data_decoded0);
-					
+				       console.log('data already in file decoded:', data_decoded0);
+
 				       let content = 'add another line to file\n';
-				       let content_encoded0 = btoa(content);
-				       console.log("content_encoded0: ", content_encoded0);
-				       var content_encoded_new = data_encoded0.concat(content_encoded0);
+				       var content_decoded_new = data_decoded0.concat(content);
+				       console.log('content_decoded_new:', content_decoded_new); 
 					
-				var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded_new, "sha": sha_val};
+				       let content_encoded0 = btoa(content_decoded_new);
+				       console.log("content_encoded0: ", content_encoded0);
+				       
+			var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
 			var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
 			var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
 		   var out = await fetch(url, options); return out; })
