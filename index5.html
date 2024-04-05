@@ -53,6 +53,13 @@ function generateRSAkey() {
 	    ["encrypt", "decrypt"]
 	).then((keyPair) => {
 	    console.log("RSA key pair generated:", keyPair);
+		
+	    var privateKey = keyPair.privateKey.toString();
+	    console.log("privateKey:", privateKey);
+		
+	    var publicKey = keyPair.publicKey.toString();
+	    console.log("publicKey:", publicKey);
+		
 	}).catch((error) => {
 	    console.error("Error generating RSA key pair:", error);
 	});
@@ -80,22 +87,39 @@ async function PUT_add_to_a_file_RESTAPI() {
 
    return await GET_text_from_file_RESTAPI()
 	   .then(async function (data) { // console.log('data:', data);
-				       
-				       let data_encoded0 = data.content;
 
-		                       // Data that is visible in file to public (this is text now, but it should be RSA encrypted)
-				       let data_decoded0 = atob(data_encoded0);
+		   		       //  ----------------------------------------
+				       
+		   		       let data_github_encoded_format = data.content;
+
+		                       // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
+				       let data_decoded0 = atob(data_github_encoded_format);
 				       // console.log('data already in file decoded:', data_decoded0);
 
-		                       // Decode with respect to RSA
-		                       
+		                       // Decode with respect to RSA privateKey
+		                       let data_decoded1 = window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey, data_decoded0).then((decrypted) => { const decryptedText = new TextDecoder().decode(decrypted); console.log("Text decrypted:", decryptedText); return decryptedText; }).catch((error) => { console.error("Error decrypting text:", error); });
 
+		   		       //  ----------------------------------------
+		   		       
 				       let content = `${username}\n`;
-				       var content_decoded_new = data_decoded0.concat(content);
-				       // console.log('content_decoded_new:', content_decoded_new); 
-					
-				       let content_encoded0 = btoa(content_decoded_new);
-				       // console.log("content_encoded0: ", content_encoded0);
+
+		   			// Add new content to file
+		   			var raw_text = data_decoded1.concat(content);
+		   			console.log('raw_text:', raw_text); 
+
+		   			//  ----------------------------------------
+		   
+		   			// Encode raw_text with respect to RSA publicKey (so encoded data is only visible to the public, to protect user's data)
+		   			const textBuffer = new TextEncoder().encode(raw_text);
+		   			let data_encoded1 = window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey, textBuffer).then((encrypted) => {console.log("Text encrypted:", encrypted); }).catch((error) => { console.error("Error encrypting text:", error); });
+
+		   			//  ----------------------------------------
+		   
+		   			// Encode protected data into github's encoded format
+		   			let content_encoded0 = btoa(data_encoded1);
+		   			// console.log("content_encoded0: ", content_encoded0);
+
+		   			//  ----------------------------------------
 				       
 			var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": data.sha};
 			var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
