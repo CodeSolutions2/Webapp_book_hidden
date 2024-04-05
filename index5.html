@@ -88,6 +88,7 @@ async function PUT_add_to_a_file_RESTAPI() {
 		   const textBuffer = new TextEncoder().encode(raw_text); console.log('textBuffer:', textBuffer);  return textBuffer; })
 	.then(async function (textBuffer) {let data_encoded1 = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer); return data_encoded1; })
 	.then(async function (data_encoded1) {
+		
 		console.log("data_encoded1:", data_encoded1);
 		console.log("data_encoded1.toString():", data_encoded1.toString());
 		
