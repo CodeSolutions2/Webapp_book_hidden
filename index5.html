@@ -40,23 +40,6 @@ var publicKey_obj = {};
 var sha_val = "";
 var raw_text = "";
 
-
-// ----------------------------------------------------
-// Generate RSA key pair
-// https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
-// ----------------------------------------------------
-// async function generateRSAkey() {
-	
-// 	return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
-	// 	.then(async function(keyPair) => { console.log("RSA key pair generated:", keyPair); var privateKey_obj = keyPair.privateKey; var publicKey_obj = keyPair.publicKey; localStorage.setItem('privateKey_obj', privateKey_obj); localStorage.setItem('publicKey_obj', publicKey_obj);
-// 		   const exported = await window.crypto.subtle.exportKey("pkcs8", publicKey_obj).then(res => res).then(res => {return res; }); const publicExportedKeyBuffer = new Uint8Array(exported); let publicExportKeyOutput = `[${publicExportedKeyBuffer}]`; console.log('publicExportKeyOutput:', publicExportKeyOutput); localStorage.setItem('publicExportKeyOutput', publicExportKeyOutput);
-// 	})
-	// .catch((error) => { console.error("Error generating RSA key pair:", error); });
-// }
-  
-// ----------------------------------------------------
-
-
 	
 // ----------------------------------------------------
 // PUT add to an existing file - Way 0: REST API
@@ -73,6 +56,7 @@ async function PUT_add_to_a_file_RESTAPI() {
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
    return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
+	   // Generate RSA key pair - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
 	   .then((keyPair) => { privateKey_obj = keyPair.privateKey; publicKey_obj = keyPair.publicKey; })
 	   // update the global variables privateKey_obj and publicKey_obj
 	   .then(async function() { let out = await GET_text_from_file_RESTAPI(); return out; })
@@ -104,10 +88,11 @@ async function PUT_add_to_a_file_RESTAPI() {
 		   const textBuffer = new TextEncoder().encode(raw_text); console.log('textBuffer:', textBuffer);  return textBuffer; })
 	.then(async function (textBuffer) {let data_encoded1 = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer); return data_encoded1; })
 	.then(async function (data_encoded1) {
-		console.log("Text encrypted:", data_encoded1);
+		console.log("data_encoded1:", data_encoded1);
+		console.log("data_encoded1.toString():", data_encoded1.toString());
 		
 		// Encode protected data into github's encoded format
-		let content_encoded0 = btoa(data_encoded1);
+		let content_encoded0 = btoa(data_encoded1.toString());
 		console.log("content_encoded0: ", content_encoded0);
 		
 		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
