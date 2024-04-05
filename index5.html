@@ -75,10 +75,10 @@ async function PUT_add_to_a_file_RESTAPI() {
    return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
 	   .then((keyPair) => { privateKey_obj = keyPair.privateKey; publicKey_obj = keyPair.publicKey; })
 	   // update the global variables privateKey_obj and publicKey_obj
-	   .then(async function() { await GET_text_from_file_RESTAPI(); })
-	   .then(async function (data) {
-		   sha_val = data.sha;
-		   let data_github_encoded_format = data.content;
+	   .then(async function() { let out = await GET_text_from_file_RESTAPI(); return out; })
+	   .then(async function (out) {
+		   sha_val = out.sha;
+		   let data_github_encoded_format = out.content;
 		   
 		   // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
 		   let data_decoded0 = atob(data_github_encoded_format);
