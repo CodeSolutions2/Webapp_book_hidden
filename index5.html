@@ -83,6 +83,14 @@ async function PUT_add_to_a_file_RESTAPI() {
 	   .then(async function (data) { // console.log('data:', data);
 
 		   var keyPair = await generateRSAkey();
+
+		   //  ----------------------------------------
+		   
+		   var privateKey_obj = keyPair.privateKey;
+		   var publicKey_obj = keyPair.publicKey;
+
+		   //  ----------------------------------------
+		   
 		   var privateKey = keyPair.privateKey.algorithm.hash.toString();
 	    console.log("privateKey:", privateKey);
 		
@@ -99,7 +107,7 @@ async function PUT_add_to_a_file_RESTAPI() {
 				       // console.log('data already in file decoded:', data_decoded0);
 
 		                       // Decode with respect to RSA privateKey
-		                       let data_decoded1 = window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey, data_decoded0).then((decrypted) => { const decryptedText = new TextDecoder().decode(decrypted); console.log("Text decrypted:", decryptedText); return decryptedText; }).catch((error) => { console.error("Error decrypting text:", error); });
+		                       let data_decoded1 = window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, data_decoded0).then((decrypted) => { const decryptedText = new TextDecoder().decode(decrypted); console.log("Text decrypted:", decryptedText); return decryptedText; }).catch((error) => { console.error("Error decrypting text:", error); });
 
 		   		       //  ----------------------------------------
 		   		       
@@ -113,7 +121,7 @@ async function PUT_add_to_a_file_RESTAPI() {
 		   
 		   			// Encode raw_text with respect to RSA publicKey (so encoded data is only visible to the public, to protect user's data)
 		   			const textBuffer = new TextEncoder().encode(raw_text);
-		   			let data_encoded1 = window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey, textBuffer).then((encrypted) => {console.log("Text encrypted:", encrypted); }).catch((error) => { console.error("Error encrypting text:", error); });
+		   			let data_encoded1 = window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer).then((encrypted) => {console.log("Text encrypted:", encrypted); }).catch((error) => { console.error("Error encrypting text:", error); });
 
 		   			//  ----------------------------------------
 		   
