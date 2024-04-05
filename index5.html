@@ -13,7 +13,7 @@
 
 <button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
 	  
-<button id="generateRSAkey" onclick="generateRSAkey()" style="display:block">generateRSAkey</button>
+<!-- <button id="generateRSAkey" onclick="generateRSAkey()" style="display:block">generateRSAkey</button> -->
 
 <!-- <input type="file" id="text_file_input" accept=".txt"> -->
 	  
@@ -43,14 +43,14 @@ var publicKey_obj = {};
 // Generate RSA key pair
 // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
 // ----------------------------------------------------
-async function generateRSAkey() {
+// async function generateRSAkey() {
 	
-	return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
-		.then(async function(keyPair) => { console.log("RSA key pair generated:", keyPair); var privateKey_obj = keyPair.privateKey; var publicKey_obj = keyPair.publicKey; localStorage.setItem('privateKey_obj', privateKey_obj); localStorage.setItem('publicKey_obj', publicKey_obj);
-		   const exported = await window.crypto.subtle.exportKey("pkcs8", publicKey_obj).then(res => res).then(res => {return res; }); const publicExportedKeyBuffer = new Uint8Array(exported); let publicExportKeyOutput = `[${publicExportedKeyBuffer}]`; console.log('publicExportKeyOutput:', publicExportKeyOutput); localStorage.setItem('publicExportKeyOutput', publicExportKeyOutput);
-	})
-	.catch((error) => { console.error("Error generating RSA key pair:", error); });
-}
+// 	return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
+	// 	.then(async function(keyPair) => { console.log("RSA key pair generated:", keyPair); var privateKey_obj = keyPair.privateKey; var publicKey_obj = keyPair.publicKey; localStorage.setItem('privateKey_obj', privateKey_obj); localStorage.setItem('publicKey_obj', publicKey_obj);
+// 		   const exported = await window.crypto.subtle.exportKey("pkcs8", publicKey_obj).then(res => res).then(res => {return res; }); const publicExportedKeyBuffer = new Uint8Array(exported); let publicExportKeyOutput = `[${publicExportedKeyBuffer}]`; console.log('publicExportKeyOutput:', publicExportKeyOutput); localStorage.setItem('publicExportKeyOutput', publicExportKeyOutput);
+// 	})
+	// .catch((error) => { console.error("Error generating RSA key pair:", error); });
+// }
   
 // ----------------------------------------------------
 
