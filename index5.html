@@ -82,7 +82,7 @@ async function PUT_add_to_a_file_RESTAPI() {
    return await GET_text_from_file_RESTAPI()
 	   .then(async function (data) { // console.log('data:', data);
 
-		   var keyPair = generateRSAkey();
+		   var keyPair = await generateRSAkey();
 		   var privateKey = keyPair.privateKey.algorithm.hash.toString();
 	    console.log("privateKey:", privateKey);
 		
