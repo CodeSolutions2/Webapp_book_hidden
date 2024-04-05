@@ -45,8 +45,8 @@ var publicKey_obj = {};
 // ----------------------------------------------------
 async function generateRSAkey() {
 	
-	return window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
-		.then((keyPair) => { console.log("RSA key pair generated:", keyPair); var privateKey_obj = keyPair.privateKey; var publicKey_obj = keyPair.publicKey; localStorage.setItem('privateKey_obj', privateKey_obj); localStorage.setItem('publicKey_obj', publicKey_obj);
+	return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
+		.then(async function(keyPair) => { console.log("RSA key pair generated:", keyPair); var privateKey_obj = keyPair.privateKey; var publicKey_obj = keyPair.publicKey; localStorage.setItem('privateKey_obj', privateKey_obj); localStorage.setItem('publicKey_obj', publicKey_obj);
 		   const exported = await window.crypto.subtle.exportKey("pkcs8", publicKey_obj).then(res => res).then(res => {return res; }); const publicExportedKeyBuffer = new Uint8Array(exported); let publicExportKeyOutput = `[${publicExportedKeyBuffer}]`; console.log('publicExportKeyOutput:', publicExportKeyOutput); localStorage.setItem('publicExportKeyOutput', publicExportKeyOutput);
 	})
 	.catch((error) => { console.error("Error generating RSA key pair:", error); });
