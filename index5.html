@@ -37,6 +37,8 @@ var message = "a new commit message";
 var privateKey_obj = {}; 
 var publicKey_obj = {};
 
+var sha_val = "";
+var raw_text = "";
 
 
 // ----------------------------------------------------
@@ -75,57 +77,45 @@ async function PUT_add_to_a_file_RESTAPI() {
 	   // update the global variables privateKey_obj and publicKey_obj
 	   .then(async function() { await GET_text_from_file_RESTAPI(); })
 	   .then(async function (data) {
+		   sha_val = data.sha;
+		   let data_github_encoded_format = data.content;
 		   
-		   // console.log('data:', data);
-
-		   		       //  ----------------------------------------
-				       
-		   		       let data_github_encoded_format = data.content;
-
-		                       // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
-				       let data_decoded0 = atob(data_github_encoded_format);
-				       console.log('data already in file decoded:', data_decoded0);
-
+		   // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
+		   let data_decoded0 = atob(data_github_encoded_format);
+		   console.log('data already in file decoded:', data_decoded0);
+		   
 		   // Convert string into 
- // const uint8Array = new TextEncoder().encode(str);
- // const arrayBuffer = uint8Array.buffer;
-	
-		                       // Decode with respect to RSA privateKey
-		                       // let data_decoded1 = window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, data_decoded0).then((decrypted) => { const decryptedText = new TextDecoder().decode(decrypted); console.log("Text decrypted:", decryptedText); return decryptedText; }).catch((error) => { console.error("Error decrypting text:", error); });
-
-		   		       //  ----------------------------------------
-		   		       
-				       let content = `${username}\n`;
-
-		   			// Add new content to file
-		   			// var raw_text = data_decoded1.concat(content);  // with RSA encryption, Should be this in the future
-		   			var raw_text = data_decoded0.concat(content); // without using RSA encryption
-		   			console.log('raw_text:', raw_text); 
-
-		   			//  ----------------------------------------
+		   // const uint8Array = new TextEncoder().encode(str);
+		   // const arrayBuffer = uint8Array.buffer;
 		   
-		   			// Encode raw_text with respect to RSA publicKey (so encoded data is only visible to the public, to protect user's data)
+		   // Decode with respect to RSA privateKey
+		   // let data_decoded1 = window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, data_decoded0).then((decrypted) => { const decryptedText = new TextDecoder().decode(decrypted); console.log("Text decrypted:", decryptedText); return decryptedText; }).catch((error) => { console.error("Error decrypting text:", error); });
+		   
+		   let content = `${username}\n`;
+		   
+		   // Add new content to file
+		   // var raw_text = data_decoded1.concat(content);  // with RSA encryption, Should be this in the future
+		   raw_text = data_decoded0.concat(content); // without using RSA encryption
+		   console.log('raw_text:', raw_text); 
+		   
+		   //  ----------------------------------------
+		   
+		   // Encode raw_text with respect to RSA publicKey (so encoded data is only visible to the public, to protect user's data)
 		   			const textBuffer = new TextEncoder().encode(raw_text);
 		   			console.log('textBuffer:', textBuffer); 
-		   			return textBuffer;
-	   })
-	.then(async function (textBuffer) {
+		   			return textBuffer; })
+	.then(async function (textBuffer) {let data_encoded1 = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer)
+	.then((encrypted) => {
+		console.log("Text encrypted:", encrypted);
 		
-		   			let data_encoded1 = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer)
-						.then((encrypted) => {console.log("Text encrypted:", encrypted); })
-
-		   			//  ----------------------------------------
-		   
-		   			// Encode protected data into github's encoded format
-		   			let content_encoded0 = btoa(data_encoded1);
-		   			// console.log("content_encoded0: ", content_encoded0);
-
-		   			//  ----------------------------------------
-				       
-			var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": data.sha};
-			var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
-			var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
-		   var out = await fetch(url, options); return out; })
+		// Encode protected data into github's encoded format
+		let content_encoded0 = btoa(data_encoded1);
+		// console.log("content_encoded0: ", content_encoded0);
+		
+		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
+		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
+		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
+		var out = await fetch(url, options); return out; })
 	   		.then(res => { console.log(res); } )
 	   		.catch(error => { console.log(error); });
 
