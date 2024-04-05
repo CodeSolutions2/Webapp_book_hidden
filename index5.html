@@ -44,8 +44,8 @@ async function PUT_add_to_a_file_RESTAPI() {
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
    return await fetch(url)
 	   .then(res => res.json())
-	   .then(data => { let sha_val = data.sha; console.log('sha_val: ', sha_val); return sha_val; })
-	   .then(async function (tot) { let tot =[]; var data = await GET_text_from_file_RESTAPI(); tot.push(atob(data.content)); return tot.push(sha_val); })   
+	   .then(data => { let sha_val0 = data.sha; console.log('sha_val0: ', sha_val0); return sha_val0; })
+	   .then(async function (tot) { let tot =[]; var data = await GET_text_from_file_RESTAPI(); tot.push(atob(data.content)); return tot.push(sha_val0); })   
 	   .then(async function (tot) { let sha_val = tot.pop; 
 				       console.log('sha_val:', sha_val); 
 				       let content = 'add another line to file\n';
