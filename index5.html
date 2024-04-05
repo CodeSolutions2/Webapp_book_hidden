@@ -57,8 +57,6 @@ function generateRSAkey() {
 	}).catch((error) => {
 	    console.error("Error generating RSA key pair:", error);
 	});
-
-
 }
   
 // ----------------------------------------------------
@@ -91,36 +89,44 @@ async function PUT_add_to_a_file_RESTAPI() {
 
 		   //  ----------------------------------------
 		   
-		   var privateKey = keyPair.privateKey.algorithm.hash.toString();
-	    console.log("privateKey:", privateKey);
-		
-	    var publicKey = keyPair.publicKey.algorithm.hash.toString();
-	    console.log("publicKey:", publicKey);
+		   const exported = await window.crypto.subtle.exportKey("pkcs8", privateKey_obj);
+  const exportedKeyBuffer = new Uint8Array(exported);
 
-
+  //const exportKeyOutput = document.querySelector(".exported-key");
+  //exportKeyOutput.textContent = `[${exportedKeyBuffer}]`;
+		   let exportKeyOutput = `[${exportedKeyBuffer}]`;
+		   console.log('exportKeyOutput:', exportKeyOutput);
+		   
 		   		       //  ----------------------------------------
 				       
 		   		       let data_github_encoded_format = data.content;
 
 		                       // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
 				       let data_decoded0 = atob(data_github_encoded_format);
-				       // console.log('data already in file decoded:', data_decoded0);
+				       console.log('data already in file decoded:', data_decoded0);
 
+		   // Convert string into 
+ // const uint8Array = new TextEncoder().encode(str);
+ // const arrayBuffer = uint8Array.buffer;
+	
 		                       // Decode with respect to RSA privateKey
-		                       let data_decoded1 = window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, data_decoded0).then((decrypted) => { const decryptedText = new TextDecoder().decode(decrypted); console.log("Text decrypted:", decryptedText); return decryptedText; }).catch((error) => { console.error("Error decrypting text:", error); });
+		                       // let data_decoded1 = window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, data_decoded0).then((decrypted) => { const decryptedText = new TextDecoder().decode(decrypted); console.log("Text decrypted:", decryptedText); return decryptedText; }).catch((error) => { console.error("Error decrypting text:", error); });
 
 		   		       //  ----------------------------------------
 		   		       
 				       let content = `${username}\n`;
 
 		   			// Add new content to file
-		   			var raw_text = data_decoded1.concat(content);
+		   			// var raw_text = data_decoded1.concat(content);  // with RSA encryption, Should be this in the future
+		   			var raw_text = data_decoded0.concat(content); // without using RSA encryption
 		   			console.log('raw_text:', raw_text); 
 
 		   			//  ----------------------------------------
 		   
 		   			// Encode raw_text with respect to RSA publicKey (so encoded data is only visible to the public, to protect user's data)
 		   			const textBuffer = new TextEncoder().encode(raw_text);
+		   			console.log('textBuffer:', textBuffer); 
+		   
 		   			let data_encoded1 = window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer).then((encrypted) => {console.log("Text encrypted:", encrypted); }).catch((error) => { console.error("Error encrypting text:", error); });
 
 		   			//  ----------------------------------------
