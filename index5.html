@@ -12,6 +12,8 @@
 <button id="PUT_add_to_a_file_RESTAPI" onclick="PUT_add_to_a_file_RESTAPI()" style="display:block">PUT_add_to_a_file_RESTAPI</button>
 
 <button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
+	  
+<button id="generateRSAkey" onclick="generateRSAkey()" style="display:block">generateRSAkey</button>
 
 <!-- <input type="file" id="text_file_input" accept=".txt"> -->
 	  
@@ -31,6 +33,36 @@ var repoName = "testing_filereader";
 var filename = "data.txt";
 
 var message = "a new commit message";
+
+
+
+// ----------------------------------------------------
+// Generate RSA key pair
+// https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
+// ----------------------------------------------------
+function generateRSAkey() {
+	
+	window.crypto.subtle.generateKey(
+	    {
+	        name: "RSA-OAEP",
+	        modulusLength: 2048,
+	        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+	        hash: {name: "SHA-256"}
+	    },
+	    true,
+	    ["encrypt", "decrypt"]
+	).then((keyPair) => {
+	    console.log("RSA key pair generated:", keyPair);
+	}).catch((error) => {
+	    console.error("Error generating RSA key pair:", error);
+	});
+
+
+}
+  
+// ----------------------------------------------------
+
+
 	
 // ----------------------------------------------------
 // PUT add to an existing file - Way 0: REST API
