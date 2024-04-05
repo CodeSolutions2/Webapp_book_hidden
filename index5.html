@@ -42,7 +42,7 @@ var message = "a new commit message";
 // ----------------------------------------------------
 function generateRSAkey() {
 	
-	window.crypto.subtle.generateKey(
+	return window.crypto.subtle.generateKey(
 	    {
 	        name: "RSA-OAEP",
 	        modulusLength: 2048,
@@ -53,13 +53,7 @@ function generateRSAkey() {
 	    ["encrypt", "decrypt"]
 	).then((keyPair) => {
 	    console.log("RSA key pair generated:", keyPair);
-		
-	    var privateKey = keyPair.privateKey.toString();
-	    console.log("privateKey:", privateKey);
-		
-	    var publicKey = keyPair.publicKey.toString();
-	    console.log("publicKey:", publicKey);
-		
+	    return keyPair;
 	}).catch((error) => {
 	    console.error("Error generating RSA key pair:", error);
 	});
@@ -87,6 +81,14 @@ async function PUT_add_to_a_file_RESTAPI() {
 
    return await GET_text_from_file_RESTAPI()
 	   .then(async function (data) { // console.log('data:', data);
+
+		   var keyPair = generateRSAkey();
+		   var privateKey = keyPair.privateKey.algorithm.hash.toString();
+	    console.log("privateKey:", privateKey);
+		
+	    var publicKey = keyPair.publicKey.algorithm.hash.toString();
+	    console.log("publicKey:", publicKey);
+
 
 		   		       //  ----------------------------------------
 				       
