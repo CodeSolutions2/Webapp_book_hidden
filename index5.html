@@ -86,14 +86,18 @@ async function PUT_add_to_a_file_RESTAPI() {
 		   
 		   // Encode raw_text with respect to RSA publicKey (so encoded data is only visible to the public, to protect user's data)
 		   const textBuffer = new TextEncoder().encode(raw_text); console.log('textBuffer:', textBuffer);  return textBuffer; })
-	.then(async function (textBuffer) {let data_encoded1 = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer); return data_encoded1; })
-	.then(async function (data_encoded1) {
+	.then(async function (textBuffer) {let data_encoded_arrayBuffer = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer); return data_encoded_arrayBuffer; })
+	.then(async function (data_encoded_arrayBuffer) {
 		
-		console.log("data_encoded1:", data_encoded1);
-		console.log("data_encoded1.toString():", data_encoded1.toString());
+		console.log("data_encoded_arrayBuffer:", data_encoded_arrayBuffer);
+		
+		const uint8Array = new Uint8Array(data_encoded_arrayBuffer);
+		const textDecoder = new TextDecoder();
+		const data_encoded1_String = textDecoder.decode(uint8Array);
+		console.log("data_encoded1_String:", data_encoded1_String);
 		
 		// Encode protected data into github's encoded format
-		let content_encoded0 = btoa(data_encoded1.toString());
+		let content_encoded0 = btoa(data_encoded1_String);
 		console.log("content_encoded0: ", content_encoded0);
 		
 		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
