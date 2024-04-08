@@ -41,7 +41,7 @@ var sha_val = "";
 var raw_text = "";
 
 var which_way = 0;
-var data_decoded_String = "";
+var data_decoded_String = " ";
 	
 // ----------------------------------------------------
 
@@ -122,7 +122,7 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 			   // Way 0: gives character error
 			   // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
 		   data_decoded_String = atob(data_github_encoded_format);
-		   console.log('data already in file decoded:', data_decoded_String);
+		   console.log('data_decoded_String:', data_decoded_String);
 			   
 		   // } else {
 			   // Convert base64 to string
