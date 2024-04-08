@@ -155,12 +155,12 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 		// Convert it to Uint8Array (a standard array format)
 		const uint8Array = new Uint8Array(data_encoded_arrayBuffer);
 		console.log('uint8Array:', uint8Array); 
-		var strout4 = new Uint8Array(Buffer.from(data_encoded_arrayBuffer, 'base64'))
 		const textDecoder = new TextDecoder('utf-8');
 		const data_encoded1_String = textDecoder.decode(uint8Array);
 		console.log("data_encoded1_String:", data_encoded1_String);
 
 		// Way 3
+		// var strout4 = new Uint8Array(Buffer.from(data_encoded_arrayBuffer, 'base64')) // need Node.js library
 		var data_encoded2_String = new Uint8Array(ToBase64(data_encoded_arrayBuffer));
 		console.log("data_encoded2_String:", data_encoded2_String);
 
