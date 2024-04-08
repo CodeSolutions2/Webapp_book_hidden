@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    
+<input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+
+<input id="username" type="text" value="" placeholder="username" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+	  
+<button id="PUT_add_to_a_file_RESTAPI" onclick="PUT_add_to_a_file_RESTAPI()" style="display:block">PUT_add_to_a_file_RESTAPI</button>
+
+<button id="PUT_add_to_a_file_RESTAPI_crypto" onclick="PUT_add_to_a_file_RESTAPI_crypto()" style="display:block">PUT_add_to_a_file_RESTAPI_crypto</button>
+	  
+<button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
+
+<!-- <input type="file" id="text_file_input" accept=".txt"> -->
+	  
+    
+<!-- View results -->
+<div id="output" style="font-family:courier;font-size:24px;height:300px"></div>
+
+
+<script>
+
+// ----------------------------------------------------
+
+const outp = document.getElementById('output');
+  
+var repoOwner = "CodeSolutions2";
+var repoName = "testing_filereader";
+var filename = "data.txt";
+
+var message = "a new commit message";
+
+var privateKey_obj = {}; 
+var publicKey_obj = {};
+
+var sha_val = "";
+var raw_text = "";
+
+
+// ----------------------------------------------------
+
+	
+async function PUT_add_to_a_file_RESTAPI() {
+
+   const auth = document.getElementById("auth_id").value;
+
+   const username = document.getElementById("username").value;
+   
+   // PUT into an existing file
+   var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+   return await GET_text_from_file_RESTAPI()
+	   .then(async function (out) {
+		   sha_val = out.sha;
+		   let data_github_encoded_format = out.content;
+		   
+		   // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
+		   let data_decoded0 = atob(data_github_encoded_format);
+		   console.log('data already in file decoded:', data_decoded0);
+		   
+		   let content = `${username}\n`;
+		   
+		   // Add new content to file
+		   raw_text = data_decoded0.concat(content); // without using RSA encryption
+		   console.log('raw_text:', raw_text); 
+		   
+		// Encode protected data into github's encoded format
+		let content_encoded0 = btoa(raw_text);
+		console.log("content_encoded0: ", content_encoded0);
+		
+		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
+		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
+		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
+		var out1 = await fetch(url, options); return out1; })
+	   		.then(res => { console.log(res); } )
+	   		.catch(error => { console.log(error); });
+
+}
+
+	
+// ----------------------------------------------------
+// PUT add to an existing file - Way 0: REST API
+// Can only write to a public repository, can not write to a private repository even if the key grants access
+// https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#create-or-update-file-contents
+	//https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/exportKey
+// ----------------------------------------------------
+async function PUT_add_to_a_file_RESTAPI_crypto() {
+
+   const auth = document.getElementById("auth_id").value;
+
+   const username = document.getElementById("username").value;
+   
+   // PUT into an existing file
+   var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+   return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
+	   // Generate RSA key pair - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
+	   .then((keyPair) => { privateKey_obj = keyPair.privateKey; publicKey_obj = keyPair.publicKey; })
+	   // update the global variables privateKey_obj and publicKey_obj
+	   .then(async function() { let out = await GET_text_from_file_RESTAPI(); return out; })
+	   .then(async function (out) {
+		   sha_val = out.sha;
+		   let data_github_encoded_format = out.content;
+		   
+		   // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
+		   let data_decoded0 = atob(data_github_encoded_format);
+		   console.log('data already in file decoded:', data_decoded0);
+		   
+		   // Convert string into 
+		   // const uint8Array = new TextEncoder().encode(str);
+		   // const arrayBuffer = uint8Array.buffer;
+		   
+		   // Decode with respect to RSA privateKey
+		   // let data_decoded1 = window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, data_decoded0).then((decrypted) => { const decryptedText = new TextDecoder().decode(decrypted); console.log("Text decrypted:", decryptedText); return decryptedText; }).catch((error) => { console.error("Error decrypting text:", error); });
+		   
+		   let content = `${username}\n`;
+		   
+		   // Add new content to file
+		   // var raw_text = data_decoded1.concat(content);  // with RSA encryption, Should be this in the future
+		   raw_text = data_decoded0.concat(content); // without using RSA encryption
+		   console.log('raw_text:', raw_text); 
+		   
+		   //  ----------------------------------------
+		   
+		   // Encode raw_text with respect to RSA publicKey (so encoded data is only visible to the public, to protect user's data)
+		   const textBuffer = new TextEncoder().encode(raw_text); console.log('textBuffer:', textBuffer);  return textBuffer; })
+	.then(async function (textBuffer) {let data_encoded_arrayBuffer = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer); return data_encoded_arrayBuffer; })
+	.then(async function (data_encoded_arrayBuffer) {
+		
+		console.log("data_encoded_arrayBuffer:", data_encoded_arrayBuffer);
+		
+		const uint8Array = new Uint8Array(data_encoded_arrayBuffer);
+		const textDecoder = new TextDecoder('utf-8');
+		const data_encoded1_String = textDecoder.decode(uint8Array);
+		console.log("data_encoded1_String:", data_encoded1_String);
+		
+		// Encode protected data into github's encoded format
+		let content_encoded0 = btoa(data_encoded1_String);
+		console.log("content_encoded0: ", content_encoded0);
+		
+		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
+		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
+		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
+		var out1 = await fetch(url, options); return out1; })
+	   		.then(res => { console.log(res); } )
+	   		.catch(error => { console.log(error); });
+
+}
+  
+// ----------------------------------------------------
+
+	
+
+// ----------------------------------------------------
+// GET data in a file - Way 0: REST API (WORKS!)
+// https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#get-repository-content
+// ----------------------------------------------------
+async function GET_text_from_file_RESTAPI() {
+
+	const auth = document.getElementById("auth_id").value;
+	
+	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+	var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"}
+	var options = {method : 'GET', headers: headers};
+	
+	return await fetch(url, options).then(res => res.json())
+		.then(data => { 
+			// console.log('data: ', data); 
+			return data; })
+		.catch(error => { console.log(error); });
+}
+
+async function func2() {
+	await GET_text_from_file_RESTAPI()
+		.then(data => {
+			console.log('data.content: ', data.content); 
+			var content_decoded0 = atob(data.content);
+   console.log("content_decoded0: ", content_decoded0);
+			});
+	
+}
+	
+// ----------------------------------------------------
+
+
+  
+</script>
+
+  </body>
+</html>
