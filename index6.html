@@ -143,10 +143,12 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 		const uint8Array = new Uint8Array(data_encoded_arrayBuffer);
 		console.log('uint8Array:', uint8Array); 
 
-		const strout2 = String.fromCharCode.apply(null, data_encoded_arrayBuffer);
-		console.log("strout2:", strout2);
+		// const strout2 = String.fromCharCode.apply(null, data_encoded_arrayBuffer);
+		// console.log("strout2:", strout2);
+		// <empty string>
 		
-		//String.fromCharCode(...(new Uint8Array(signature)))
+		const strout3 = String.fromCharCode(...(new Uint8Array(data_encoded_arrayBuffer)));
+		console.log("strout3:", strout3);
 		//  -----------------
 
 		// Convert the encoded arrayBuffer to a string
