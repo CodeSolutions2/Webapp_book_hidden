@@ -90,7 +90,7 @@ async function PUT_add_to_a_file_RESTAPI() {
 // PUT add to an existing file - Way 0: REST API
 // Can only write to a public repository, can not write to a private repository even if the key grants access
 // https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#create-or-update-file-contents
-	//https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/exportKey
+// https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/exportKey
 // ----------------------------------------------------
 async function PUT_add_to_a_file_RESTAPI_crypto() {
 
@@ -138,8 +138,11 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 		
 		console.log("data_encoded_arrayBuffer:", data_encoded_arrayBuffer);
 
-		// Convert the encoded arrayBuffer to a string
+		// Convert it to Uint8Array (a standard array format)
 		const uint8Array = new Uint8Array(data_encoded_arrayBuffer);
+		console.log('uint8Array:', uint8Array); 
+
+		// Convert the encoded arrayBuffer to a string
 		const textDecoder = new TextDecoder('utf-8');
 		const data_encoded1_String = textDecoder.decode(uint8Array);
 		console.log("data_encoded1_String:", data_encoded1_String);
