@@ -47,9 +47,10 @@ var raw_text = "";
 async function PUT_add_to_a_file_RESTAPI() {
 
    const auth = document.getElementById("auth_id").value;
-	// OR
-	const auth = process.env.MY_SECRET_NAME;
-console.log(mySecret);
+   // OR
+   // Use codespaces
+   //const auth = process.env.MY_SECRET_NAME;
+   //console.log(mySecret);
 
    const username = document.getElementById("username").value;
    
@@ -125,7 +126,7 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 		   // Add new content to file
 		   // var raw_text = data_decoded1.concat(content);  // with RSA encryption, Should be this in the future
 		   raw_text = data_decoded0.concat(content); // without using RSA encryption
-		   console.log('raw_text:', raw_text); 
+		   console.log('raw_text string:', raw_text); 
 		   
 		   //  ----------------------------------------
 		   
