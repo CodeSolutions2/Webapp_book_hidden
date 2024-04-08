@@ -139,25 +139,35 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 		console.log("data_encoded_arrayBuffer:", data_encoded_arrayBuffer);
 
 		//  -----------------
-		// Convert it to Uint8Array (a standard array format)
-		const uint8Array = new Uint8Array(data_encoded_arrayBuffer);
-		console.log('uint8Array:', uint8Array); 
 
+		// Convert the encoded arrayBuffer to a string
+
+		// Way 0
 		// const strout2 = String.fromCharCode.apply(null, data_encoded_arrayBuffer);
 		// console.log("strout2:", strout2);
 		// <empty string>
-		
-		const strout3 = String.fromCharCode(...(new Uint8Array(data_encoded_arrayBuffer)));
-		console.log("strout3:", strout3);
-		//  -----------------
 
-		// Convert the encoded arrayBuffer to a string
+		// Way 1
+		const data_encoded0_String = String.fromCharCode(...(new Uint8Array(data_encoded_arrayBuffer)));
+		console.log("data_encoded0_String:", data_encoded0_String);
+
+		// Way 2
+		// Convert it to Uint8Array (a standard array format)
+		const uint8Array = new Uint8Array(data_encoded_arrayBuffer);
+		console.log('uint8Array:', uint8Array); 
+		var strout4 = new Uint8Array(Buffer.from(data_encoded_arrayBuffer, 'base64'))
 		const textDecoder = new TextDecoder('utf-8');
 		const data_encoded1_String = textDecoder.decode(uint8Array);
 		console.log("data_encoded1_String:", data_encoded1_String);
+
+		// Way 3
+		var data_encoded2_String = new Uint8Array(Buffer.from(data_encoded_arrayBuffer, 'base64'));
+		console.log("data_encoded2_String:", data_encoded2_String);
+
+		//  -----------------
 		
 		// Encode protected data into github's encoded format
-		let content_encoded0 = btoa(data_encoded1_String);
+		let content_encoded0 = btoa(data_encoded0_String);
 		console.log("content_encoded0: ", content_encoded0);
 		
 		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
