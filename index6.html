@@ -47,6 +47,9 @@ var raw_text = "";
 async function PUT_add_to_a_file_RESTAPI() {
 
    const auth = document.getElementById("auth_id").value;
+	// OR
+	const auth = process.env.MY_SECRET_NAME;
+console.log(mySecret);
 
    const username = document.getElementById("username").value;
    
