@@ -161,7 +161,7 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 		console.log("data_encoded1_String:", data_encoded1_String);
 
 		// Way 3
-		var data_encoded2_String = new Uint8Array(Buffer.from(data_encoded_arrayBuffer, 'base64'));
+		var data_encoded2_String = new Uint8Array(ToBase64(data_encoded_arrayBuffer));
 		console.log("data_encoded2_String:", data_encoded2_String);
 
 		//  -----------------
