@@ -165,19 +165,21 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 
    const username = document.getElementById("username").value;
 
-   publicKeyJwk = document.getElementById("publicKeyJwk").value;
+   publicKeyJwk_str = document.getElementById("publicKeyJwk").value;
+   var publicKeyJwk_obj = JSON.parse(publicKeyJwk_str);
 
-   privateKeyJwk = document.getElementById("privateKeyJwk").value;
+   privateKeyJwk_str = document.getElementById("privateKeyJwk").value;
+   var privateKeyJwk_obj = JSON.parse(privateKeyJwk_str);
    
    // PUT into an existing file
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
 	// STEP 0: Import/convert the exported publicKey_jwk key back to the publicKey_obj
-	   return await window.crypto.subtle.importKey("jwk", publicKeyJwk, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, [])
+	   return await window.crypto.subtle.importKey("jwk", publicKeyJwk_obj, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, [])
 		   .then(async function(publicKey_obj) { return publicKey_obj; })
 	   
 		// STEP 1: Import/convert the exported privateKey_jwk key back to the privateKey_obj
-	   .then(async function() { privateKey_obj = await window.crypto.subtle.importKey("jwk", privateKeyJwk, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["deriveKey", "deriveBits"]); return privateKey_obj; })
+	   .then(async function() { privateKey_obj = await window.crypto.subtle.importKey("jwk", privateKeyJwk_obj, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["deriveKey", "deriveBits"]); return privateKey_obj; })
 
 	   // STEP 2: Obtain existing data from the file/database in the GitHub public repository
 	   .then(async function() { let database_encrypted_data = await GET_text_from_file_RESTAPI(); return database_encrypted_data; })
