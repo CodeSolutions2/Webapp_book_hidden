@@ -8,6 +8,12 @@
 <input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 
 <input id="username" type="text" value="" placeholder="username" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+
+<input id="privateKey_jwk" type="text" value="" placeholder="privateKey_jwk" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+
+<input id="publicKey_jwk" type="text" value="" placeholder="publicKeyJwk" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+	  
+<button id="Generate_keys_crypto" onclick="Generate_keys_crypto()" style="display:block">Generate_keys_crypto</button>
 	  
 <button id="PUT_add_to_a_file_RESTAPI" onclick="PUT_add_to_a_file_RESTAPI()" style="display:block">PUT_add_to_a_file_RESTAPI</button>
 
@@ -34,13 +40,15 @@ var filename = "data.txt";
 
 var message = "a new commit message";
 
-var privateKey_obj = {}; 
+var privateKey_jwk = ""; 
+var publicKey_jwk = "";
 var publicKey_obj = {};
-
+var privateKey_obj = {};
+	
 var sha_val = "";
 var raw_text = "";
 
-var which_way = 1;
+var which_way = 0;
 	
 // ----------------------------------------------------
 
@@ -86,6 +94,31 @@ async function PUT_add_to_a_file_RESTAPI() {
 
 }
 
+
+
+async function Generate_keys_crypto() {
+	// STEP 0: Generate public and private keys (public key=for encrypting, private key=for decrypting)
+   return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"])
+	   // STEP 1: Obtain RSA key pair as individual objects - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
+	   .then(async function (keyPair) {
+		   // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
+		   privateKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair.privateKey);
+		   console.log('privateKey_jwk:', privateKey_jwk);
+		   // OR
+		   // privateKey_obj = keyPair.privateKey;
+		   
+		   // ------------------
+		   
+		   // Get public key as a string
+		   publicKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair.publicKey);
+		   console.log('publicKey_jwk:', cur_publicKey_jwk);
+		   // OR
+		   // publicKey_obj = keyPair.publicKey; // One can directly encrypt string data with this key
+		   })
+
+}
+
+	
 	
 // ----------------------------------------------------
 // PUT add to an existing file - Way 0: REST API
@@ -98,67 +131,61 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
    const auth = document.getElementById("auth_id").value;
 
    const username = document.getElementById("username").value;
+
+   publicKeyJwk = document.getElementById("publicKeyJwk").value;
+
+   privateKeyJwk = document.getElementById("privateKeyJwk").value;
    
    // PUT into an existing file
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
-   return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
-	   // Generate RSA key pair - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
-	   .then((keyPair) => { privateKey_obj = keyPair.privateKey; publicKey_obj = keyPair.publicKey; 
-			      // Check if proof of concept works
-			       localStorage.setItem('privateKey_obj', privateKey_obj);
-			      })
-	   // update the global variables privateKey_obj and publicKey_obj
-	   .then(async function() { let out = await GET_text_from_file_RESTAPI(); return out; })
-	   .then(async function (out) {
-		   sha_val = out.sha;
-		   let data_github_encoded_format = out.content;
-		   console.log('data_github_encoded_format:', data_github_encoded_format);
+	// STEP 0: Import/convert the exported publicKey_jwk key back to the publicKey_obj
+	   return await window.crypto.subtle.importKey("jwk", publicKeyJwk, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, [])
+		   .then(async function(publicKey_obj) { return publicKey_obj; })
+	   
+		// STEP 1: Import/convert the exported privateKey_jwk key back to the privateKey_obj
+	   .then(async function() { privateKey_obj = await window.crypto.subtle.importKey("jwk", privateKeyJwk, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["deriveKey", "deriveBits"]); return privateKey_obj; })
 
-		   //  -----------------
-		   
-		   if (which_way == 0) {
-		          var data_decoded_String = " ";
+	   // STEP 2: Obtain existing data from the file/database in the GitHub public repository
+	   .then(async function() { let database_encrypted_data = await GET_text_from_file_RESTAPI(); return database_encrypted_data; })
+	   
+	   // STEP 3: Obtain the existing encrypted data from the database
+	   .then(async function (database_encrypted_data) {
+		   sha_val = database_encrypted_data.sha;
+		   let database_data = database_encrypted_data.content;
+		   console.log('database_data:', database_data); return database_data; })
+	   
+	// STEP 4: Decrypt the existing encrypted data from the database to obtain a string
+	// Temporary: Run this to initially encrypt data
+	.then(async function (database_data) { var decryptedText = " "; })
+	// OR
+	//.then(async function (database_data) { 
+		// Convert base64 to string
+	//	var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
 
-		   } else {
-			   
-			   // Way 0: gives character error
-			   // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
-			   // var data_decoded_String = atob(data_github_encoded_format);
-
-			   // OR
+		//var data_decoded_String = Base64.decode(database_data);
+		//console.log('data_decoded_String:', data_decoded_String);
 		   
-			   // Convert base64 to string
-			   // Way 1
-			   var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
-
-			   var data_decoded_String = Base64.decode(data_github_encoded_format);
-			   
-			   //  -----------------
-			   
-			   console.log('data_decoded_String:', data_decoded_String);
+		//  -----------------
 		   
-			   //  -----------------
-		   
-			   // Convert string into arraybuffer
-			   const uint8Array = new TextEncoder().encode(data_decoded_String);
-			   const arrayBuffer = uint8Array.buffer;
+		// Convert string into arraybuffer
+		//const uint8Array = new TextEncoder().encode(data_decoded_String);
+		//const arrayBuffer = uint8Array.buffer;
 			   
-			   // Decode with respect to RSA privateKey
-			   privateKey_obj = localStorage.getItem('privateKey_obj');
-			   data_decoded_String = window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, arrayBuffer).then((decrypted) => { const decryptedText = new TextDecoder().decode(decrypted); console.log("Text decrypted:", decryptedText); return decryptedText; }).catch((error) => { console.error("Error decrypting text:", error); });
-			   
-			   //  -----------------
-		   }
-		   
-		   //  ----------------------------------------
-		   
+		// Decode with respect to RSA privateKey
+		//data_decoded_String = await window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, arrayBuffer); return data_decoded_String;
+	})
+	//.then((data_decoded_String) => { var decryptedText = new TextDecoder().decode(data_decoded_String); 
+			      console.log("Text decrypted:", decryptedText); return decryptedText; })
+				      
+	// STEP 5: concatenate new string data to add to the file/database string, encode the new string data as an arraybuffer for re-encryption
+	.then(async function (decryptedText) {
 		   let content = `${username}\n`;
 
 		   //  ----------------------------------------
 		   
 		   // Add new content to file
-		   raw_text = data_decoded_String.concat(content);  // with RSA encryption
+		   raw_text = decryptedText.concat(content);  // with RSA encryption
 		   console.log('raw_text string:', raw_text); 
 		   
 		   //  ----------------------------------------
@@ -166,19 +193,14 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 		   // Convert string raw_text to an arrayBuffer
 		   // Encode arrayBuffer with RSA publicKey (so encoded data is only visible to the public, to protect user's data)
 		   const textBuffer = new TextEncoder().encode(raw_text); console.log('textBuffer:', textBuffer);  return textBuffer; })
+		   
+	   // STEP 6: Use the public key object to re-encrypt the string data, it returns an new arrayBuffer
 	.then(async function (textBuffer) {let data_encoded_arrayBuffer = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer); return data_encoded_arrayBuffer; })
+	   // STEP 7: Convert the encoded/encrypted arrayBuffer to a string, such that it is saved in the public file using fetch PUT
 	.then(async function (data_encoded_arrayBuffer) {
-		
 		console.log("data_encoded_arrayBuffer:", data_encoded_arrayBuffer);
 
 		//  -----------------
-
-		// Convert the encoded arrayBuffer to a string
-
-		// Way 0
-		// const strout2 = String.fromCharCode.apply(null, data_encoded_arrayBuffer);
-		// console.log("strout2:", strout2);
-		// <empty string>
 
 		// Way 1
 		const data_encoded0_String = String.fromCharCode(...(new Uint8Array(data_encoded_arrayBuffer)));
@@ -201,19 +223,17 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 		// console.log("content_encoded0: ", content_encoded0);
 
 		// Way 1
-		var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
+		var Base64 = {_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
 
 		let content_encoded0 = Base64.encode(data_encoded0_String);
 		console.log("content_encoded0: ", content_encoded0);
 
 		//  -----------------
-		
-		
-		
 		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
 		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
 		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
 		var out1 = await fetch(url, options); return out1; })
+	   
 	   		.then(res => { console.log(res); } )
 	   		.catch(error => { console.log(error); });
 
