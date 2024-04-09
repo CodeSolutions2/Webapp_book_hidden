@@ -164,7 +164,7 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 	   
 	   // STEP 1: Import/convert the exported privateKey_jwk_obj key back to the privateKey_obj
 	   .then(async function() { privateKey_obj = await window.crypto.subtle.importKey("jwk", privateKey_jwk_obj, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["deriveKey", "deriveBits"]); return privateKey_obj; })
-	   
+	   ;
 
 }
   
