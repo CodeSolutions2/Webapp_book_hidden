@@ -44,6 +44,7 @@ var privateKey_jwk = "";
 var publicKey_jwk = "";
 var publicKey_obj = {};
 var privateKey_obj = {};
+var keyPair_obj = {};
 	
 var sha_val = "";
 var raw_text = "";
@@ -100,9 +101,9 @@ async function Generate_keys_crypto() {
 	// STEP 0: Generate public and private keys (public key=for encrypting, private key=for decrypting)
    return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"])
 	   // STEP 1: Obtain RSA key pair as individual objects - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
-	   .then(async function (keyPair) {
+	   .then(async function (keyPair_obj) {
 		   // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
-		   privateKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair.privateKey);
+		   privateKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
 		   console.log('privateKey_jwk:', privateKey_jwk);
 		   // OR
 		   // privateKey_obj = keyPair.privateKey;
@@ -110,7 +111,7 @@ async function Generate_keys_crypto() {
 		   // ------------------
 		   
 		   // Get public key as a string
-		   publicKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair.publicKey);
+		   publicKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
 		   console.log('publicKey_jwk:', cur_publicKey_jwk);
 		   // OR
 		   // publicKey_obj = keyPair.publicKey; // One can directly encrypt string data with this key
