@@ -103,12 +103,16 @@ async function Generate_keys_crypto() {
 	   // STEP 1: Obtain RSA key pair as individual objects - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
 	   .then((keyPair_obj) => { return keyPair_obj})
 	    // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
-	    .then(async function() { privateKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair_obj.privateKey); console.log('privateKey_jwk:', privateKey_jwk); 
-				   // privateKey_obj = keyPair.privateKey;
-				   })
-	    .then(async function() { publicKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair_obj.publicKey); console.log('publicKey_jwk:', cur_publicKey_jwk); 
-				   // publicKey_obj = keyPair.publicKey; // One can directly encrypt string data with this key
-				   })
+	    .then(async function() { 
+		    // privateKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
+		    // console.log('privateKey_jwk:', privateKey_jwk); 
+		    privateKey_obj = keyPair.privateKey;
+		    })
+	    .then(async function() { 
+		    // publicKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
+		    // console.log('publicKey_jwk:', cur_publicKey_jwk); 
+		    publicKey_obj = keyPair.publicKey; // One can directly encrypt string data with this key
+	    })
 
 }
 
