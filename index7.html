@@ -4,16 +4,18 @@
     <base target="_top">
   </head>
   <body>
-    
-<input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 
+<!-- ----------------------------------- -->
+<!-- Strings that need to be stored in a secret location for security: temporarily as inputs to test app functionality -->
+<input id="auth_id" type="text" value="" placeholder="auth_id" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+
+<input id="publicKey_jwk_str" type="text" value="" placeholder="publicKey_jwk_str" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+
+<input id="privateKey_jwk_str" type="text" value="" placeholder="privateKey_jwk_str" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+<!-- ----------------------------------- -->
+	  
 <input id="username" type="text" value="" placeholder="username" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 
-<input id="publicKeyJwk_str_input" type="text" value="" placeholder="publicKeyJwk_str_input" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
-	  
-<input id="privateKeyJwk_str_input" type="text" value="" placeholder="privateKeyJwk_str_input" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
-
-	  
 <button id="Generate_keys_crypto" onclick="Generate_keys_crypto()" style="display:block">Generate_keys_crypto</button>
 	  
 <!-- <button id="PUT_add_to_a_file_RESTAPI" onclick="PUT_add_to_a_file_RESTAPI()" style="display:block">PUT_add_to_a_file_RESTAPI</button> -->
@@ -39,32 +41,35 @@ var repoOwner = "CodeSolutions2";
 var repoName = "testing_filereader";
 var filename = "data.txt";
 
-var message = "a new commit message";
-
-var privateKey_jwk_str = ""; 
-var publicKey_jwk_str = "";
-var publicKey_obj = {};
-var privateKey_obj = {};
-var keyPair_obj = {};
+var message = "a new commit message"
 	
 var sha_val = "";
 var raw_text = "";
 
 var which_way = 0;
+
+// ----------------------------------------------------
+	
+// Input the secrets here via code below
+var publicKey_obj = {};
+var privateKey_obj = {};
+var keyPair_obj = {};
 	
 // ----------------------------------------------------
 
 	
 async function PUT_add_to_a_file_RESTAPI() {
 
+   // Input the secrets here: I do not know how to do this yet
    const auth = document.getElementById("auth_id").value;
-   // OR
-   // Use codespaces
-   // const auth = process.env.MY_SECRET_NAME;
-   // console.log(mySecret);
 
+   // -----------------------
+	
+   // Front-end: the user inputs their desired username
    const username = document.getElementById("username").value;
-   
+
+   // -----------------------
+	
    // PUT into an existing file
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
@@ -96,39 +101,10 @@ async function PUT_add_to_a_file_RESTAPI() {
 
 }
 
-// ----------------------------------------------------
-
-
-async function PUT_JWT_in_a_file_RESTAPI(desired_filename_str, desired_filename) {
-
-   const auth = document.getElementById("auth_id").value;
-   
-   // PUT into an existing file
-   var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${desired_filename_str}`;
-
-   return await GET_text_from_file_RESTAPI()
-	   .then(async function (out) {
-		   sha_val = out.sha;
-		   let data_github_encoded_format = out.content;
-		   
-		   
-		// Encode protected data into github's encoded format
-		let content_encoded0 = btoa(desired_filename);
-		console.log("content_encoded0: ", content_encoded0);
-		
-		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
-		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
-		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
-		var out1 = await fetch(url, options); return out1; })
-	   		.then(res => { console.log(res); } )
-	   		.catch(error => { console.log(error); });
-
-}
-
-// ----------------------------------------------------
 	
+// ----------------------------------------------------
 
-
+	
 async function Generate_keys_crypto() {
 	// STEP 0: Generate public and private keys (public key=for encrypting, private key=for decrypting)
    return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"])
@@ -136,19 +112,16 @@ async function Generate_keys_crypto() {
 	   // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
 	   .then(async function(keyPair_obj) { 
 		   var privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
-		   privateKey_jwk_str = JSON.stringify(privateKey_jwk);
-		   console.log('privateKey_jwk_str:', privateKey_jwk_str); 
+		   var NEW_privateKey_jwk_str = JSON.stringify(privateKey_jwk);
+		   console.log('NEW_privateKey_jwk_str:', NEW_privateKey_jwk_str); 
 		   // privateKey_obj = keyPair_obj.privateKey;
 		   // -----------------------------
 		   var publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
-		   publicKey_jwk_str = JSON.stringify(publicKey_jwk);
-		   console.log('publicKey_jwk_str:', publicKey_jwk_str); 
+		   var NEW_publicKey_jwk_str = JSON.stringify(publicKey_jwk);
+		   console.log('NEW_publicKey_jwk_str:', NEW_publicKey_jwk_str); 
 		   // publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this 
 		   return keyPair_obj;
 	   })
-	// There is a LOT of JSON text, so save the JSON string to a repo file
-	// .then(async function(privateKey_jwk) { await PUT_JWT_in_a_file_RESTAPI('privateKey_jwk', privateKey_jwk_str); })
-	// .then(async function() { await PUT_JWT_in_a_file_RESTAPI('publicKey_jwk', publicKey_jwk_str); })
 	
 }
 
@@ -162,27 +135,35 @@ async function Generate_keys_crypto() {
 // ----------------------------------------------------
 async function PUT_add_to_a_file_RESTAPI_crypto() {
 
+   // Input the secrets here: I do not know how to do this yet
    const auth = document.getElementById("auth_id").value;
+   const publicKey_jwk_str = document.getElementById("publicKey_jwk_str").value;
+   const privateKey_jwk_str = document.getElementById("privateKey_jwk_str").value;
 
+   // -----------------------
+	
+   // Front-end: the user inputs their desired username
    const username = document.getElementById("username").value;
 
-   // publicKeyJwk_str = document.getElementById("publicKeyJwk_str_input").value;
-   publicKeyJwk_str = '{"alg":"RSA-OAEP-256","e":"AQAB","ext":true,"key_ops":["encrypt"],"kty":"RSA","n":"2Wj21SldgQKejYHx0ak3EsnP1dPkBvtJHNSpYw1RosWQbpMvKBcxaa68NyCH1zsfuE-SQEWObhBTID9YNsxw-VufQZRCEuQ8llG6AR51uN1zbf2QtovGVCUL3eKfyIvKmC5v1QKptCRl5sRyoAwMT_R_xa_ugmOQfRPvZ8ISlCXprTP49vh0EOQJS6eskaQM6KBEc5bVTU-yqUTdAHZzt1rc9oSTOTmQOnPTyn8NzOZWpvgDeiI6t9Y9-W7ouS-mXfWlRqEJRyuABAhWF8LMk583_T1cYb-0Uz--J2c8Ox71pR7WMZzOsNhiBOODN-ATkpyItRKScH85YZ0pDSa12Q"}';
-   var publicKeyJwk_obj = JSON.parse(publicKeyJwk_str);
-console.log('publicKeyJwk_obj: ', publicKeyJwk_obj)
+   // -----------------------
 	
-   // privateKeyJwk_str = document.getElementById("privateKeyJwk_str_input").value;
-   privateKeyJwk_str = '{"alg":"RSA-OAEP-256","d":"V60eWfGAHV5ujZe5azmIFcIgWFXG0E_3eLKEiwcchH2TFRyzOEI-MaX_jmXGknRsAtrIGrZSTa20sD0LeLHy34TlET_Wc6Lqkh5sWjYr-H0KJ3HKMevldBqqkfVqRaimb7_OZsNXp-fD1pAjv8qMDpSGELW2BIxdgSuQcTIRZv-ypmuov2ZY7oi7jQXvRozVwsaLqeUWsccVnr4A3tkV3L9NWR-2r2pu4Hg1_d4aneAkyk3UrugHLpaTOje5ollPTkHaJNsxv4VfdTjWCIYd8dguSIxYCsYO4A_R7ulC_F9w98zb_w15LJritmjZQivdnV9YaR-6qwEeYunzo7trvw","dp":"5jnQqpxPmPHOL7dOXcWGaq2ieva9rv1RAlIEdyoceAY9f2j5XOSUHf6OFfkIaXzC_3IXkEs0qCsB1SMHXOxZGjlEc3f4olqK5I0g0COyo2c6csKVPGngoZUZ5xf5yBRXYGNfih_xbvf96Rdo4pow7s-KOAw6xAw5_eMHYUXOEnU","dq":"ah1S8E1u0KKanUhJ-Qfdm1QUSpA5B1-ewJVdHuoqnqqwO9N6qEJJayNeCxkkKbZPh_SdvkoaN2a9LT6i1QecTQdkPv5_O-w7q7eb9-fK6hS5Pt2IG9cYfDTS_wtnaSFpRulUe29xBezY0G0zqetPet2aFC1aA7bnphrP9oon-EM","e":"AQAB","ext":true,"key_ops":["decrypt"],"kty":"RSA","n":"2Wj21SldgQKejYHx0ak3EsnP1dPkBvtJHNSpYw1RosWQbpMvKBcxaa68NyCH1zsfuE-SQEWObhBTID9YNsxw-VufQZRCEuQ8llG6AR51uN1zbf2QtovGVCUL3eKfyIvKmC5v1QKptCRl5sRyoAwMT_R_xa_ugmOQfRPvZ8ISlCXprTP49vh0EOQJS6eskaQM6KBEc5bVTU-yqUTdAHZzt1rc9oSTOTmQOnPTyn8NzOZWpvgDeiI6t9Y9-W7ouS-mXfWlRqEJRyuABAhWF8LMk583_T1cYb-0Uz--J2c8Ox71pR7WMZzOsNhiBOODN-ATkpyItRKScH85YZ0pDSa12Q","p":"9tbpDz2D54OYCq1tqBVkuVSpmkS8wVV6f-ICIerbaeCc0zTU4QqiMIrkvOUhhgPJvX99NUrPsTIju7Rdk_rmJ1PZFmhvJPXg4yClxOZsKmyyUdKNEReMuaw8ht0d9jEqaVVG9eeSxUObhjuyWEfZPUpK1Knp1oAYs6OVPS0JJ_8","q":"4Xp1yruobzuuBvrF5uYvBYzXXBgIoPX_2i-KX4-6njo1MPn8h0QqgiKwCEsX2nALihLJ9y8bdf5tgup6fXfOb-Y_P_3cR6RdD3DFVtNLTkZ2VuRTxqgDafHu2dTG3_XLVIqjzO_o7-Nv67s1ouGGfOztCE29hmlBr-QpeoCOYic","qi":"rqWTFJVo7pFHBiDt-nbaYKhvGSdLIm1rIgYEEfX4CX8ojP9oXCjVDAlFktszERvELMikNdKIk62f6WG6tE5aNXvF8YLDjfw85DQXvNE0q3x_7SSLy-xXCqeyIa724xlFgwLOWaXnZQf_vCwrKrfXzkSEe1lINqjLS5Vfr0TNB_A"}';
-   var privateKeyJwk_obj = JSON.parse(privateKeyJwk_str);
-   console.log('privateKeyJwk_obj: ', privateKeyJwk_obj)
+   var publicKey_jwk_obj = JSON.parse(publicKey_jwk_str);
+   console.log('publicKey_jwk_obj: ', publicKey_jwk_obj)
 
+   var privateKey_jwk_obj = JSON.parse(privateKey_jwk_str);
+   console.log('privateKey_jwk_obj: ', privateKey_jwk_obj)
+
+   // -----------------------
 	
    // PUT into an existing file
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
-	// STEP 0: Import/convert the exported publicKey_jwk key back to the publicKey_obj
-	   return await window.crypto.subtle.importKey("jwk", publicKeyJwk_obj, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, [])
-		   .then(async function(publicKey_obj) { return publicKey_obj; })
+   // STEP 0: Import/convert the exported publicKey_jwk_obj key back to the publicKey_obj
+   return await window.crypto.subtle.importKey("jwk", publicKey_jwk_obj, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, [])
+	   .then(async function(publicKey_obj) { return publicKey_obj; })
+	   
+	   // STEP 1: Import/convert the exported privateKey_jwk_obj key back to the privateKey_obj
+	   .then(async function() { privateKey_obj = await window.crypto.subtle.importKey("jwk", privateKey_jwk_obj, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["deriveKey", "deriveBits"]); return privateKey_obj; })
 	   
 
 }
@@ -197,12 +178,15 @@ console.log('publicKeyJwk_obj: ', publicKeyJwk_obj)
 // ----------------------------------------------------
 async function GET_text_from_file_RESTAPI() {
 
-	const auth = document.getElementById("auth_id").value;
-	
-	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+   // Input the secrets here: I do not know how to do this yet
+   const auth = document.getElementById("auth_id").value;
 
-	var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"}
-	var options = {method : 'GET', headers: headers};
+   // -----------------------
+	
+   var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+   var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"}
+   var options = {method : 'GET', headers: headers};
 	
 	return await fetch(url, options).then(res => res.json())
 		.then(data => { 
