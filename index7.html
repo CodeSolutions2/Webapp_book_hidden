@@ -101,19 +101,26 @@ async function Generate_keys_crypto() {
 	// STEP 0: Generate public and private keys (public key=for encrypting, private key=for decrypting)
    return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"])
 	   // STEP 1: Obtain RSA key pair as individual objects - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
-	   .then((keyPair_obj) => { privateKey_jwk = window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
-		    console.log('privateKey_jwk:', privateKey_jwk); return keyPair_obj})
+	   .then(async function(keyPair_obj) { 
+		   privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
+		   console.log('privateKey_jwk:', privateKey_jwk); 
+		   privateKey_obj = keyPair_obj.privateKey;
+		   publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
+		   console.log('publicKey_jwk:', cur_publicKey_jwk); 
+		   publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this 
+		   return keyPair_obj
+	   })
 	    // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
 	   // .then(async function() { 
 		//    privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
 		//    console.log('privateKey_jwk:', privateKey_jwk); 
 		//    privateKey_obj = keyPair_obj.privateKey;
 		//    })
-	    .then(async function() { 
-		    publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
-		    console.log('publicKey_jwk:', cur_publicKey_jwk); 
-		    publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this key
-	    })
+	    // .then(async function() { 
+		    // publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
+		    // console.log('publicKey_jwk:', cur_publicKey_jwk); 
+		    // publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this key
+	    // })
 
 }
 
