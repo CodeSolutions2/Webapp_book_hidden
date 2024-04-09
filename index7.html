@@ -106,12 +106,12 @@ async function Generate_keys_crypto() {
 	    .then(async function() { 
 		    // privateKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
 		    // console.log('privateKey_jwk:', privateKey_jwk); 
-		    privateKey_obj = keyPair.privateKey;
+		    privateKey_obj = keyPair_obj.privateKey;
 		    })
 	    .then(async function() { 
 		    // publicKey_jwk = await window crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
 		    // console.log('publicKey_jwk:', cur_publicKey_jwk); 
-		    publicKey_obj = keyPair.publicKey; // One can directly encrypt string data with this key
+		    publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this key
 	    })
 
 }
