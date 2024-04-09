@@ -106,10 +106,11 @@ async function Generate_keys_crypto() {
 		   console.log('privateKey_jwk:', privateKey_jwk); 
 		   privateKey_obj = keyPair_obj.privateKey;
 		   publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
-		   console.log('publicKey_jwk:', cur_publicKey_jwk); 
+		   console.log('publicKey_jwk:', publicKey_jwk); 
 		   publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this 
 		   return keyPair_obj
 	   })
+	
 	    // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
 	   // .then(async function() { 
 		//    privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
