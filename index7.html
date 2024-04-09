@@ -9,9 +9,9 @@
 
 <input id="username" type="text" value="" placeholder="username" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 
-<input id="privateKey_jwk" type="text" value="" placeholder="privateKey_jwk" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
-
-<input id="publicKey_jwk" type="text" value="" placeholder="publicKeyJwk" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+<input id="publicKeyJwk_str_input" type="text" value="" placeholder="publicKeyJwk_str_input" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+	  
+<input id="privateKeyJwk_str_input" type="text" value="" placeholder="privateKeyJwk_str_input" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
 	  
 <button id="Generate_keys_crypto" onclick="Generate_keys_crypto()" style="display:block">Generate_keys_crypto</button>
 	  
@@ -165,10 +165,10 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 
    const username = document.getElementById("username").value;
 
-   publicKeyJwk_str = document.getElementById("publicKeyJwk").value;
+   publicKeyJwk_str = document.getElementById("publicKeyJwk_str_input").value;
    var publicKeyJwk_obj = JSON.parse(publicKeyJwk_str);
 
-   privateKeyJwk_str = document.getElementById("privateKeyJwk").value;
+   privateKeyJwk_str = document.getElementById("privateKeyJwk_str_input").value;
    var privateKeyJwk_obj = JSON.parse(privateKeyJwk_str);
    
    // PUT into an existing file
