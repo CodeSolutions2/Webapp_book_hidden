@@ -107,12 +107,12 @@ async function Generate_keys_crypto() {
 	   .then(async function(keyPair_obj) { 
 		   var privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
 		   var NEW_privateKey_jwk_str = JSON.stringify(privateKey_jwk);
-		   console.log('NEW_privateKey_jwk_str:', NEW_privateKey_jwk_str); 
+		   console.log('first 10 characters of NEW_privateKey_jwk_str:', NEW_privateKey_jwk_str.slice(0,10)+'...'); 
 		   // privateKey_obj = keyPair_obj.privateKey;
 		   // -----------------------------
 		   var publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
 		   var NEW_publicKey_jwk_str = JSON.stringify(publicKey_jwk);
-		   console.log('NEW_publicKey_jwk_str:', NEW_publicKey_jwk_str); 
+		   console.log('first 10 characters of NEW_publicKey_jwk_str:', NEW_publicKey_jwk_str.slice(0,10)+'...'); 
 		   // publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this 
 		   return keyPair_obj;
 	   })
