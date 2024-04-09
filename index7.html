@@ -159,11 +159,11 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
    // STEP 0: Import/convert the exported publicKey_jwk_obj key back to the publicKey_obj
-   return await window.crypto.subtle.importKey("jwk", publicKey_jwk_obj, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, [])
+   return await window.crypto.subtle.importKey("jwk", publicKey_jwk_str, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, [])
 	   .then(async function(publicKey_obj) { return publicKey_obj; })
 	   
 	   // STEP 1: Import/convert the exported privateKey_jwk_obj key back to the privateKey_obj
-	   .then(async function() { privateKey_obj = await window.crypto.subtle.importKey("jwk", privateKey_jwk_obj, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["deriveKey", "deriveBits"]); return privateKey_obj; })
+	   .then(async function() { privateKey_obj = await window.crypto.subtle.importKey("jwk", privateKey_jwk_str, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["deriveKey", "deriveBits"]); return privateKey_obj; })
 	   ;
 
 }
