@@ -40,8 +40,8 @@ var filename = "data.txt";
 
 var message = "a new commit message";
 
-var privateKey_jwk = ""; 
-var publicKey_jwk = "";
+var privateKey_jwk_str = ""; 
+var publicKey_jwk_str = "";
 var publicKey_obj = {};
 var privateKey_obj = {};
 var keyPair_obj = {};
@@ -134,12 +134,12 @@ async function Generate_keys_crypto() {
 	   // STEP 1: Obtain RSA key pair as individual objects - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
 	   // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
 	   .then(async function(keyPair_obj) { 
-		   privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
+		   var privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
 		   privateKey_jwk_str = JSON.stringify(privateKey_jwk);
 		   console.log('privateKey_jwk_str:', privateKey_jwk_str); 
 		   // privateKey_obj = keyPair_obj.privateKey;
 		   // -----------------------------
-		   publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
+		   var publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
 		   publicKey_jwk_str = JSON.stringify(publicKey_jwk);
 		   console.log('publicKey_jwk_str:', publicKey_jwk_str); 
 		   // publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this 
