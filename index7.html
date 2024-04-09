@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    
+<input id="auth_id" type="text" value="" placeholder="auth" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+
+<input id="username" type="text" value="" placeholder="username" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+	  
+<button id="PUT_add_to_a_file_RESTAPI" onclick="PUT_add_to_a_file_RESTAPI()" style="display:block">PUT_add_to_a_file_RESTAPI</button>
+
+<button id="PUT_add_to_a_file_RESTAPI_crypto" onclick="PUT_add_to_a_file_RESTAPI_crypto()" style="display:block">PUT_add_to_a_file_RESTAPI_crypto</button>
+	  
+<button id="GET_text_from_file_RESTAPI" onclick="func2()" style="display:block">GET_text_from_file_RESTAPI</button>
+
+<!-- <input type="file" id="text_file_input" accept=".txt"> -->
+	  
+    
+<!-- View results -->
+<div id="output" style="font-family:courier;font-size:24px;height:300px"></div>
+
+
+<script>
+
+// ----------------------------------------------------
+
+const outp = document.getElementById('output');
+  
+var repoOwner = "CodeSolutions2";
+var repoName = "testing_filereader";
+var filename = "data.txt";
+
+var message = "a new commit message";
+
+var privateKey_obj = {}; 
+var publicKey_obj = {};
+
+var sha_val = "";
+var raw_text = "";
+
+var which_way = 1;
+	
+// ----------------------------------------------------
+
+	
+async function PUT_add_to_a_file_RESTAPI() {
+
+   const auth = document.getElementById("auth_id").value;
+   // OR
+   // Use codespaces
+   // const auth = process.env.MY_SECRET_NAME;
+   // console.log(mySecret);
+
+   const username = document.getElementById("username").value;
+   
+   // PUT into an existing file
+   var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+   return await GET_text_from_file_RESTAPI()
+	   .then(async function (out) {
+		   sha_val = out.sha;
+		   let data_github_encoded_format = out.content;
+		   
+		   // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
+		   let data_decoded0 = atob(data_github_encoded_format);
+		   console.log('data already in file decoded:', data_decoded0);
+		   
+		   let content = `${username}\n`;
+		   
+		   // Add new content to file
+		   raw_text = data_decoded0.concat(content); // without using RSA encryption
+		   console.log('raw_text:', raw_text); 
+		   
+		// Encode protected data into github's encoded format
+		let content_encoded0 = btoa(raw_text);
+		console.log("content_encoded0: ", content_encoded0);
+		
+		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
+		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
+		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
+		var out1 = await fetch(url, options); return out1; })
+	   		.then(res => { console.log(res); } )
+	   		.catch(error => { console.log(error); });
+
+}
+
+	
+// ----------------------------------------------------
+// PUT add to an existing file - Way 0: REST API
+// Can only write to a public repository, can not write to a private repository even if the key grants access
+// https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#create-or-update-file-contents
+// https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/exportKey
+// ----------------------------------------------------
+async function PUT_add_to_a_file_RESTAPI_crypto() {
+
+   const auth = document.getElementById("auth_id").value;
+
+   const username = document.getElementById("username").value;
+   
+   // PUT into an existing file
+   var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+   return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["encrypt", "decrypt"])
+	   // Generate RSA key pair - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
+	   .then((keyPair) => { privateKey_obj = keyPair.privateKey; publicKey_obj = keyPair.publicKey; 
+			      // Check if proof of concept works
+			       localStorage.setItem('privateKey_obj', privateKey_obj);
+			      })
+	   // update the global variables privateKey_obj and publicKey_obj
+	   .then(async function() { let out = await GET_text_from_file_RESTAPI(); return out; })
+	   .then(async function (out) {
+		   sha_val = out.sha;
+		   let data_github_encoded_format = out.content;
+		   console.log('data_github_encoded_format:', data_github_encoded_format);
+
+		   //  -----------------
+		   
+		   if (which_way == 0) {
+		          var data_decoded_String = " ";
+
+		   } else {
+			   
+			   // Way 0: gives character error
+			   // data_decoded0 is data that is visible in file to the public (this is text now, but it should be RSA encrypted)
+			   // var data_decoded_String = atob(data_github_encoded_format);
+
+			   // OR
+		   
+			   // Convert base64 to string
+			   // Way 1
+			   var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
+
+			   var data_decoded_String = Base64.decode(data_github_encoded_format);
+			   
+			   //  -----------------
+			   
+			   console.log('data_decoded_String:', data_decoded_String);
+		   
+			   //  -----------------
+		   
+			   // Convert string into arraybuffer
+			   const uint8Array = new TextEncoder().encode(data_decoded_String);
+			   const arrayBuffer = uint8Array.buffer;
+			   
+			   // Decode with respect to RSA privateKey
+			   privateKey_obj = localStorage.getItem('privateKey_obj');
+			   data_decoded_String = window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, arrayBuffer).then((decrypted) => { const decryptedText = new TextDecoder().decode(decrypted); console.log("Text decrypted:", decryptedText); return decryptedText; }).catch((error) => { console.error("Error decrypting text:", error); });
+			   
+			   //  -----------------
+		   }
+		   
+		   //  ----------------------------------------
+		   
+		   let content = `${username}\n`;
+
+		   //  ----------------------------------------
+		   
+		   // Add new content to file
+		   raw_text = data_decoded_String.concat(content);  // with RSA encryption
+		   console.log('raw_text string:', raw_text); 
+		   
+		   //  ----------------------------------------
+		   
+		   // Convert string raw_text to an arrayBuffer
+		   // Encode arrayBuffer with RSA publicKey (so encoded data is only visible to the public, to protect user's data)
+		   const textBuffer = new TextEncoder().encode(raw_text); console.log('textBuffer:', textBuffer);  return textBuffer; })
+	.then(async function (textBuffer) {let data_encoded_arrayBuffer = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer); return data_encoded_arrayBuffer; })
+	.then(async function (data_encoded_arrayBuffer) {
+		
+		console.log("data_encoded_arrayBuffer:", data_encoded_arrayBuffer);
+
+		//  -----------------
+
+		// Convert the encoded arrayBuffer to a string
+
+		// Way 0
+		// const strout2 = String.fromCharCode.apply(null, data_encoded_arrayBuffer);
+		// console.log("strout2:", strout2);
+		// <empty string>
+
+		// Way 1
+		const data_encoded0_String = String.fromCharCode(...(new Uint8Array(data_encoded_arrayBuffer)));
+		console.log("data_encoded0_String:", data_encoded0_String);
+
+		// Way 2
+		// Convert it to Uint8Array (a standard array format)
+		const uint8Array = new Uint8Array(data_encoded_arrayBuffer);
+		console.log('uint8Array:', uint8Array); 
+		const textDecoder = new TextDecoder('utf-8');
+		const data_encoded1_String = textDecoder.decode(uint8Array);
+		console.log("data_encoded1_String:", data_encoded1_String);
+
+		//  -----------------
+
+		// Convert string to base64
+
+		// Way 0: gives character error
+		// let content_encoded0 = btoa(data_encoded0_String);
+		// console.log("content_encoded0: ", content_encoded0);
+
+		// Way 1
+		var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
+
+		let content_encoded0 = Base64.encode(data_encoded0_String);
+		console.log("content_encoded0: ", content_encoded0);
+
+		//  -----------------
+		
+		
+		
+		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
+		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
+		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
+		var out1 = await fetch(url, options); return out1; })
+	   		.then(res => { console.log(res); } )
+	   		.catch(error => { console.log(error); });
+
+}
+  
+// ----------------------------------------------------
+
+	
+
+// ----------------------------------------------------
+// GET data in a file - Way 0: REST API (WORKS!)
+// https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#get-repository-content
+// ----------------------------------------------------
+async function GET_text_from_file_RESTAPI() {
+
+	const auth = document.getElementById("auth_id").value;
+	
+	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
+
+	var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"}
+	var options = {method : 'GET', headers: headers};
+	
+	return await fetch(url, options).then(res => res.json())
+		.then(data => { 
+			// console.log('data: ', data); 
+			return data; })
+		.catch(error => { console.log(error); });
+}
+
+async function func2() {
+	await GET_text_from_file_RESTAPI()
+		.then(data => {
+			console.log('data.content: ', data.content); 
+			var content_decoded0 = atob(data.content);
+   console.log("content_decoded0: ", content_decoded0);
+			});
+	
+}
+	
+// ----------------------------------------------------
+
+
+  
+</script>
+
+  </body>
+</html>
