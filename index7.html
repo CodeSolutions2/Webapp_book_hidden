@@ -95,12 +95,44 @@ async function PUT_add_to_a_file_RESTAPI() {
 
 }
 
+// ----------------------------------------------------
+
+
+async function PUT_JWT_in_a_file_RESTAPI(desired_filename) {
+
+   const auth = document.getElementById("auth_id").value;
+   
+   // PUT into an existing file
+   var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${desired_filename}`;
+
+   return await GET_text_from_file_RESTAPI()
+	   .then(async function (out) {
+		   sha_val = out.sha;
+		   let data_github_encoded_format = out.content;
+		   
+		   
+		// Encode protected data into github's encoded format
+		let content_encoded0 = btoa(privateKey_jwk);
+		console.log("content_encoded0: ", content_encoded0);
+		
+		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
+		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
+		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
+		var out1 = await fetch(url, options); return out1; })
+	   		.then(res => { console.log(res); } )
+	   		.catch(error => { console.log(error); });
+
+}
+
+// ----------------------------------------------------
+	
 
 
 async function Generate_keys_crypto() {
 	// STEP 0: Generate public and private keys (public key=for encrypting, private key=for decrypting)
    return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"])
 	   // STEP 1: Obtain RSA key pair as individual objects - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
+	   // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
 	   .then(async function(keyPair_obj) { 
 		   privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
 		   console.log('privateKey_jwk:', privateKey_jwk); 
@@ -108,21 +140,12 @@ async function Generate_keys_crypto() {
 		   publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
 		   console.log('publicKey_jwk:', publicKey_jwk); 
 		   publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this 
-		   return keyPair_obj
+		   return keyPair_obj;
 	   })
+	// There is a LOT of JSON text, so save the JSON string to a repo file
+	.then(async function(privateKey_jwk) { await PUT_JWT_in_a_file_RESTAPI('privateKey_jwk'); })
+	.then(async function() { await PUT_JWT_in_a_file_RESTAPI('publicKey_jwk'); })
 	
-	    // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
-	   // .then(async function() { 
-		//    privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
-		//    console.log('privateKey_jwk:', privateKey_jwk); 
-		//    privateKey_obj = keyPair_obj.privateKey;
-		//    })
-	    // .then(async function() { 
-		    // publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
-		    // console.log('publicKey_jwk:', cur_publicKey_jwk); 
-		    // publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this key
-	    // })
-
 }
 
 	
