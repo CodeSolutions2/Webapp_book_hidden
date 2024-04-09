@@ -165,12 +165,17 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 
    const username = document.getElementById("username").value;
 
-   publicKeyJwk_str = document.getElementById("publicKeyJwk_str_input").value;
+   // publicKeyJwk_str = document.getElementById("publicKeyJwk_str_input").value;
+   publicKeyJwk_str = {"alg":"RSA-OAEP-256","e":"AQAB","ext":true,"key_ops":["encrypt"],"kty":"RSA","n":"2Wj21SldgQKejYHx0ak3EsnP1dPkBvtJHNSpYw1RosWQbpMvKBcxaa68NyCH1zsfuE-SQEWObhBTID9YNsxw-VufQZRCEuQ8llG6AR51uN1zbf2QtovGVCUL3eKfyIvKmC5v1QKptCRl5sRyoAwMT_R_xa_ugmOQfRPvZ8ISlCXprTP49vh0EOQJS6eskaQM6KBEc5bVTU-yqUTdAHZzt1rc9oSTOTmQOnPTyn8NzOZWpvgDeiI6t9Y9-W7ouS-mXfWlRqEJRyuABAhWF8LMk583_T1cYb-0Uz--J2c8Ox71pR7WMZzOsNhiBOODN-ATkpyItRKScH85YZ0pDSa12Q"};
    var publicKeyJwk_obj = JSON.parse(publicKeyJwk_str);
-
-   privateKeyJwk_str = document.getElementById("privateKeyJwk_str_input").value;
+console.log('publicKeyJwk_obj: ', publicKeyJwk_obj)
+	
+   // privateKeyJwk_str = document.getElementById("privateKeyJwk_str_input").value;
+   privateKeyJwk_str = {"alg":"RSA-OAEP-256","d":"V60eWfGAHV5ujZe5azmIFcIgWFXG0E_3eLKEiwcchH2TFRyzOEI-MaX_jmXGknRsAtrIGrZSTa20sD0LeLHy34TlET_Wc6Lqkh5sWjYr-H0KJ3HKMevldBqqkfVqRaimb7_OZsNXp-fD1pAjv8qMDpSGELW2BIxdgSuQcTIRZv-ypmuov2ZY7oi7jQXvRozVwsaLqeUWsccVnr4A3tkV3L9NWR-2r2pu4Hg1_d4aneAkyk3UrugHLpaTOje5ollPTkHaJNsxv4VfdTjWCIYd8dguSIxYCsYO4A_R7ulC_F9w98zb_w15LJritmjZQivdnV9YaR-6qwEeYunzo7trvw","dp":"5jnQqpxPmPHOL7dOXcWGaq2ieva9rv1RAlIEdyoceAY9f2j5XOSUHf6OFfkIaXzC_3IXkEs0qCsB1SMHXOxZGjlEc3f4olqK5I0g0COyo2c6csKVPGngoZUZ5xf5yBRXYGNfih_xbvf96Rdo4pow7s-KOAw6xAw5_eMHYUXOEnU","dq":"ah1S8E1u0KKanUhJ-Qfdm1QUSpA5B1-ewJVdHuoqnqqwO9N6qEJJayNeCxkkKbZPh_SdvkoaN2a9LT6i1QecTQdkPv5_O-w7q7eb9-fK6hS5Pt2IG9cYfDTS_wtnaSFpRulUe29xBezY0G0zqetPet2aFC1aA7bnphrP9oon-EM","e":"AQAB","ext":true,"key_ops":["decrypt"],"kty":"RSA","n":"2Wj21SldgQKejYHx0ak3EsnP1dPkBvtJHNSpYw1RosWQbpMvKBcxaa68NyCH1zsfuE-SQEWObhBTID9YNsxw-VufQZRCEuQ8llG6AR51uN1zbf2QtovGVCUL3eKfyIvKmC5v1QKptCRl5sRyoAwMT_R_xa_ugmOQfRPvZ8ISlCXprTP49vh0EOQJS6eskaQM6KBEc5bVTU-yqUTdAHZzt1rc9oSTOTmQOnPTyn8NzOZWpvgDeiI6t9Y9-W7ouS-mXfWlRqEJRyuABAhWF8LMk583_T1cYb-0Uz--J2c8Ox71pR7WMZzOsNhiBOODN-ATkpyItRKScH85YZ0pDSa12Q","p":"9tbpDz2D54OYCq1tqBVkuVSpmkS8wVV6f-ICIerbaeCc0zTU4QqiMIrkvOUhhgPJvX99NUrPsTIju7Rdk_rmJ1PZFmhvJPXg4yClxOZsKmyyUdKNEReMuaw8ht0d9jEqaVVG9eeSxUObhjuyWEfZPUpK1Knp1oAYs6OVPS0JJ_8","q":"4Xp1yruobzuuBvrF5uYvBYzXXBgIoPX_2i-KX4-6njo1MPn8h0QqgiKwCEsX2nALihLJ9y8bdf5tgup6fXfOb-Y_P_3cR6RdD3DFVtNLTkZ2VuRTxqgDafHu2dTG3_XLVIqjzO_o7-Nv67s1ouGGfOztCE29hmlBr-QpeoCOYic","qi":"rqWTFJVo7pFHBiDt-nbaYKhvGSdLIm1rIgYEEfX4CX8ojP9oXCjVDAlFktszERvELMikNdKIk62f6WG6tE5aNXvF8YLDjfw85DQXvNE0q3x_7SSLy-xXCqeyIa724xlFgwLOWaXnZQf_vCwrKrfXzkSEe1lINqjLS5Vfr0TNB_A"};
    var privateKeyJwk_obj = JSON.parse(privateKeyJwk_str);
-   
+   console.log('privateKeyJwk_obj: ', privateKeyJwk_obj)
+
+	
    // PUT into an existing file
    var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filename}`;
 
@@ -178,98 +183,6 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 	   return await window.crypto.subtle.importKey("jwk", publicKeyJwk_obj, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, [])
 		   .then(async function(publicKey_obj) { return publicKey_obj; })
 	   
-		// STEP 1: Import/convert the exported privateKey_jwk key back to the privateKey_obj
-	   .then(async function() { privateKey_obj = await window.crypto.subtle.importKey("jwk", privateKeyJwk_obj, {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"} }, true, ["deriveKey", "deriveBits"]); return privateKey_obj; })
-
-	   // STEP 2: Obtain existing data from the file/database in the GitHub public repository
-	   .then(async function() { let database_encrypted_data = await GET_text_from_file_RESTAPI(); return database_encrypted_data; })
-	   
-	   // STEP 3: Obtain the existing encrypted data from the database
-	   .then(async function (database_encrypted_data) {
-		   sha_val = database_encrypted_data.sha;
-		   let database_data = database_encrypted_data.content;
-		   console.log('database_data:', database_data); return database_data; })
-	   
-	// STEP 4: Decrypt the existing encrypted data from the database to obtain a string
-	// Temporary: Run this to initially encrypt data
-	.then(async function (database_data) { var decryptedText = " "; })
-	// OR
-	//.then(async function (database_data) { 
-		// Convert base64 to string
-	//	var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
-
-		//var data_decoded_String = Base64.decode(database_data);
-		//console.log('data_decoded_String:', data_decoded_String);
-		   
-		//  -----------------
-		   
-		// Convert string into arraybuffer
-		//const uint8Array = new TextEncoder().encode(data_decoded_String);
-		//const arrayBuffer = uint8Array.buffer;
-			   
-		// Decode with respect to RSA privateKey
-		//data_decoded_String = await window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, arrayBuffer); return data_decoded_String;})
-	//.then((data_decoded_String) => { var decryptedText = new TextDecoder().decode(data_decoded_String); 
-		//	      console.log("Text decrypted:", decryptedText); return decryptedText; })
-				      
-	// STEP 5: concatenate new string data to add to the file/database string, encode the new string data as an arraybuffer for re-encryption
-	.then(async function (decryptedText) {
-		   let content = `${username}\n`;
-
-		   //  ----------------------------------------
-		   
-		   // Add new content to file
-		   raw_text = decryptedText.concat(content);  // with RSA encryption
-		   console.log('raw_text string:', raw_text); 
-		   
-		   //  ----------------------------------------
-		   
-		   // Convert string raw_text to an arrayBuffer
-		   // Encode arrayBuffer with RSA publicKey (so encoded data is only visible to the public, to protect user's data)
-		   const textBuffer = new TextEncoder().encode(raw_text); console.log('textBuffer:', textBuffer);  return textBuffer; })
-		   
-	   // STEP 6: Use the public key object to re-encrypt the string data, it returns an new arrayBuffer
-	.then(async function (textBuffer) {let data_encoded_arrayBuffer = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey_obj, textBuffer); return data_encoded_arrayBuffer; })
-	   // STEP 7: Convert the encoded/encrypted arrayBuffer to a string, such that it is saved in the public file using fetch PUT
-	.then(async function (data_encoded_arrayBuffer) {
-		console.log("data_encoded_arrayBuffer:", data_encoded_arrayBuffer);
-
-		//  -----------------
-
-		// Way 1
-		const data_encoded0_String = String.fromCharCode(...(new Uint8Array(data_encoded_arrayBuffer)));
-		console.log("data_encoded0_String:", data_encoded0_String);
-
-		// Way 2
-		// Convert it to Uint8Array (a standard array format)
-		const uint8Array = new Uint8Array(data_encoded_arrayBuffer);
-		console.log('uint8Array:', uint8Array); 
-		const textDecoder = new TextDecoder('utf-8');
-		const data_encoded1_String = textDecoder.decode(uint8Array);
-		console.log("data_encoded1_String:", data_encoded1_String);
-
-		//  -----------------
-
-		// Convert string to base64
-
-		// Way 0: gives character error
-		// let content_encoded0 = btoa(data_encoded0_String);
-		// console.log("content_encoded0: ", content_encoded0);
-
-		// Way 1
-		var Base64 = {_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
-
-		let content_encoded0 = Base64.encode(data_encoded0_String);
-		console.log("content_encoded0: ", content_encoded0);
-
-		//  -----------------
-		var data = {"message": message, "committer":{"name":"App name","email":"App email"}, "content": content_encoded0, "sha": sha_val};
-		var headers = {"Accept": "application/vnd.github+json", "Authorization": `Bearer ${auth}`, "X-GitHub-Api-Version": "2022-11-28"};
-		var options = {method : 'PUT', headers: headers, body : JSON.stringify(data)};
-		var out1 = await fetch(url, options); return out1; })
-	   
-	   		.then(res => { console.log(res); } )
-	   		.catch(error => { console.log(error); });
 
 }
   
