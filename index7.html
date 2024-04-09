@@ -171,10 +171,9 @@ async function PUT_add_to_a_file_RESTAPI_crypto() {
 		//const arrayBuffer = uint8Array.buffer;
 			   
 		// Decode with respect to RSA privateKey
-		//data_decoded_String = await window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, arrayBuffer); return data_decoded_String;
-	})
+		//data_decoded_String = await window.crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey_obj, arrayBuffer); return data_decoded_String;})
 	//.then((data_decoded_String) => { var decryptedText = new TextDecoder().decode(data_decoded_String); 
-			      console.log("Text decrypted:", decryptedText); return decryptedText; })
+		//	      console.log("Text decrypted:", decryptedText); return decryptedText; })
 				      
 	// STEP 5: concatenate new string data to add to the file/database string, encode the new string data as an arraybuffer for re-encryption
 	.then(async function (decryptedText) {
