@@ -135,16 +135,19 @@ async function Generate_keys_crypto() {
 	   // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
 	   .then(async function(keyPair_obj) { 
 		   privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
-		   console.log('privateKey_jwk:', privateKey_jwk); 
-		   privateKey_obj = keyPair_obj.privateKey;
+		   privateKey_jwk_str = JSON.stringify(privateKey_jwk);
+		   console.log('privateKey_jwk_str:', privateKey_jwk_str); 
+		   // privateKey_obj = keyPair_obj.privateKey;
+		   // -----------------------------
 		   publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
-		   console.log('publicKey_jwk:', publicKey_jwk); 
-		   publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this 
+		   publicKey_jwk_str = JSON.stringify(publicKey_jwk);
+		   console.log('publicKey_jwk_str:', publicKey_jwk_str); 
+		   // publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this 
 		   return keyPair_obj;
 	   })
 	// There is a LOT of JSON text, so save the JSON string to a repo file
-	.then(async function(privateKey_jwk) { await PUT_JWT_in_a_file_RESTAPI('privateKey_jwk', privateKey_jwk); })
-	.then(async function() { await PUT_JWT_in_a_file_RESTAPI('publicKey_jwk', publicKey_jwk); })
+	// .then(async function(privateKey_jwk) { await PUT_JWT_in_a_file_RESTAPI('privateKey_jwk', privateKey_jwk_str); })
+	// .then(async function() { await PUT_JWT_in_a_file_RESTAPI('publicKey_jwk', publicKey_jwk_str); })
 	
 }
 
