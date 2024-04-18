@@ -16,7 +16,11 @@
     <br><br>
     
     <h3>[A] String Snippet to encode:</h3>
-    
+
+    <ul>
+    <li>Did you know that a blob object is composed of a arrayBuffer. And, a file object is composed of a blob object. So, when one makes a blob out of a .csv or an audio file, one is essentially converting the string characters into ASCII and making a long array out of it (called an arrayBuffer).</li>
+    </ul>
+	  
     <input id="string_snippet" type="text" value="" placeholder="Enter the string snippet to encode here" rows="3" cols="300">
     
     <br><br>
@@ -76,12 +80,12 @@ async function run_encoding() {
   // -----------------
 	
   const string_snippet_encoded = btoa(string_snippet);
-  document.getElementById("Base64_encoded").innerHTML = `The base64 encoded string snippet is : ${string_snippet_encoded}.`;
+  document.getElementById("Base64_encoded").innerHTML = `The base64 encoded string snippet is : ${string_snippet_encoded}`;
 	
   // -----------------
 	
   const string_snippet_decoded = atob(string_snippet_encoded);  // binaryString
-  document.getElementById("Base64_decoded").innerHTML = `The base64 decoded string snippet is : ${string_snippet_decoded}.`;
+  document.getElementById("Base64_decoded").innerHTML = `The base64 decoded string snippet is : ${string_snippet_decoded}`;
 
   // -----------------
 	
@@ -90,8 +94,9 @@ async function run_encoding() {
   // Map each binary string character as an ASCII number
   var byteArray = character_array.map((character) => { return character.charCodeAt(0); });
 
+  // arrayBuffer gives the same output as byteArray
   const arrayBuffer = new Uint8Array(byteArray);
-  document.getElementById("ASCII_arrayBuffer").innerHTML = `The ASCII of binaryString string snippet is : ${arrayBuffer}.`;
+  document.getElementById("ASCII_arrayBuffer").innerHTML = `The ASCII of binaryString string snippet is : ${arrayBuffer}`;
 }
 
   
