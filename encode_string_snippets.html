@@ -32,14 +32,23 @@
     <br>
 
     <h3>Generate a pair of private and public data encryption keys in JSON Web Key format, using the Rivest–Shamir–Adleman algorithm <a href="https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params">https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params</a>:</h3>
-    Copy the public and private JSON Web Keys and put them in GitHub Secrets, the public JSON Web Key is used to encode data and the private JSON Web Key is used to decode data. Use these keys on GitHub Actions, GitHub Secrets are only accessable from GitHub Actions, to encode and decode data securely! 
+    Copy the public and private JSON Web Keys and manually put them in GitHub Secrets, the public JSON Web Key is used to encode data and the private JSON Web Key is used to decode data. 
+	  
+Use these keys on GitHub Actions, GitHub Secrets are only accessable from GitHub Actions, to encode and decode data securely! 
+	  
 For more information about how to use these keys, please see the mozilla developer page at <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey">https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey</a>.
-    
+
+The algorithm settings used to generate these keys were: {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"]. These settings are important to know for importing the key in GitHub Actions.
+    <br>
 <button id="Generate_keys_crypto" onclick="Generate_keys_crypto()" style="display:block">Generate public private keys using Web API SubtleCrypto</button>
     <br>
-    <label id="Public_private_keys_label" style="display:none">Public private keys in JSON Web Key format</label>
+    <label id="Public_key_label" style="display:none">Public key in JSON Web Key format</label>
     <br>
-    <textarea id="Public_private_keys" rows="4" cols="100" placeholder="Public_private_keys" style="display:block"></textarea>
+    <textarea id="Public_key" rows="6" cols="100" placeholder="Public_key" style="display:block"></textarea>
+    <br>
+    <label id="Private_key_label" style="display:none">Private key in JSON Web Key format</label>
+    <br>
+    <textarea id="Private_key" rows="8" cols="100" placeholder="Private_key" style="display:block"></textarea>
     <br>
 
 <!-- --------------------------------------------------- -->
@@ -77,25 +86,26 @@ async function Generate_keys_crypto() {
 	   // STEP 1: Obtain RSA key pair as individual objects - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
 	   // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
 	   .then(async function(keyPair_obj) { 
-       // -----------------------------
+		   // -----------------------------
 		   var publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
 		   var NEW_publicKey_jwk_str = JSON.stringify(publicKey_jwk);
 		   // publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this
-       // -----------------------------
+		   // -----------------------------
 		   var privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
 		   var NEW_privateKey_jwk_str = JSON.stringify(privateKey_jwk);
 		   // privateKey_obj = keyPair_obj.privateKey;
 		   // -----------------------------
-       document.getElementById("Public_private_keys").innerHTML = `Information used to generate this key were {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"].
-       
-       Public JsonWebKey : ${NEW_publicKey_jwk_str},
-       Private JsonWebKey: ${NEW_privateKey_jwk_str}.`;
-       // -----------------------------
-       return keyPair_obj;
+		   document.getElementById("Public_key").innerHTML = `Public JsonWebKey: ${NEW_publicKey_jwk_str}`;
+		   document.getElementById("Private_key").innerHTML = `Private JsonWebKey: ${NEW_privateKey_jwk_str}`;
+		   // -----------------------------
+		   return keyPair_obj;
 	   })
 	
 }
 
+  
+// ----------------------------------------------------
+	
 </script>
   </body>
 </html>
