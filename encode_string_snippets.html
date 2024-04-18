@@ -93,7 +93,7 @@ async function Generate_keys_crypto() {
 		   // -----------------------------
 		   var privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
 		   var NEW_privateKey_jwk_str = JSON.stringify(privateKey_jwk);
-		   // privateKey_obj = keyPair_obj.privateKey;
+		   // privateKey_obj = keyPair_obj.privateKey; // One can directly decrypt encrypted string data with this
 		   // -----------------------------
 		   document.getElementById("Public_key").innerHTML = `${NEW_publicKey_jwk_str}`;
 		   document.getElementById("Private_key").innerHTML = `${NEW_privateKey_jwk_str}`;
