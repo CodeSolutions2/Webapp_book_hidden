@@ -27,10 +27,13 @@
     <br>
     <textarea id="Base64_encoded" rows="4" cols="100" placeholder="Base64_encoded" style="display:block"></textarea>
     <br>
-
-    <label id="Base64_decoded_label" style="display:block">Base64 decoded string snippet</label>
+    <label id="Base64_decoded_label" style="display:block">Base64 decoded string snippet (binaryString)</label>
     <br>
     <textarea id="Base64_decoded" rows="4" cols="100" placeholder="Base64_decoded" style="display:block"></textarea>
+    <br>
+    <label id="ASCII_arrayBuffer_label" style="display:block">ASCII of binaryString string snippet (byteArray OR arrayBuffer)</label>
+    <br>
+    <textarea id="ASCII_arrayBuffer" rows="4" cols="100" placeholder="ASCII_arrayBuffer" style="display:block"></textarea>
     <br>
 
     <h3>[B] Generate a pair of public and private data encryption keys in JSON Web Key format:</h3>
@@ -70,13 +73,25 @@ async function run_encoding() {
   
   const string_snippet = document.getElementById("string_snippet").value;
 
+  // -----------------
+	
   const string_snippet_encoded = btoa(string_snippet);
   document.getElementById("Base64_encoded").innerHTML = `The base64 encoded string snippet is : ${string_snippet_encoded}.`;
-
-  const string_snippet_decoded = atob(string_snippet_encoded);
+	
+  // -----------------
+	
+  const string_snippet_decoded = atob(string_snippet_encoded);  // binaryString
   document.getElementById("Base64_decoded").innerHTML = `The base64 decoded string snippet is : ${string_snippet_decoded}.`;
-  
 
+  // -----------------
+	
+  var character_array = string_snippet_decoded.split('');
+  
+  // Map each binary string character as an ASCII number
+  var byteArray = character_array.map((character) => { return character.charCodeAt(0); });
+
+  const arrayBuffer = new Uint8Array(byteArray);
+  document.getElementById("ASCII_arrayBuffer").innerHTML = `The ASCII of binaryString string snippet is : ${arrayBuffer}.`;
 }
 
   
