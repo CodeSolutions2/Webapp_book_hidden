@@ -3,24 +3,24 @@
   <head></head>
   <body>
     
-    <h1 style='text-align: center; margin-bottom: -35px;'>Encode a string snippet</h1>
+    <h1 style='text-align: center; margin-bottom: -35px;'>Multi-purpose application for encryption tools</h1>
 
     <br><br>
 
      The purpose of this application is to replicate encoding functionality of <a href="https://www.base64encode.org/enc/map">https://www.base64encode.org/enc/map</a> to understand the mapping of encoding methods. 
+    
+    And, to serve as a method to generate private and public data encryption keys, such that one can place the keys manually in GitHub Secrets. Manually storing the private and public data encryption keys on the GitHub server, using GitHub Secrets, is a secure way to encode and decode data while protecting user information.
 
     <br><br>
     
     <h3>String Snippet to encode:</h3>
     
-    <input id="string_snippet" type="text" value="" placeholder="Enter the string snippet to encode here" rows="3" cols="100">
+    <input id="string_snippet" type="text" value="" placeholder="Enter the string snippet to encode here" rows="3" cols="300">
     
     <br><br>
 
-    <button id="Run_Selection" onclick="run()">Run Selection</button>
-      
+    <button id="Run_Selection" onclick="run_encoding()">Run Selection</button>
     <br><br>
-      
     <label id="Base64_encoded_label" style="display:none">Base64 encoded string snippet</label>
     <br>
     <textarea id="Base64_encoded" rows="4" cols="100" placeholder="Base64_encoded" style="display:block"></textarea>
@@ -31,7 +31,16 @@
     <textarea id="Base64_decoded" rows="4" cols="100" placeholder="Base64_decoded" style="display:block"></textarea>
     <br>
 
+    <h3>Generate a pair of private and public data encryption keys in JSON Web Key format, using the Rivest–Shamir–Adleman algorithm <a href="https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params">https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params</a>:</h3>
+    Copy the public and private JSON Web Keys and put them in GitHub Secrets, the public JSON Web Key is used to encode data and the private JSON Web Key is used to decode data. Use these keys on GitHub Actions, GitHub Secrets are only accessable from GitHub Actions, to encode and decode data securely! 
+For more information about how to use these keys, please see the mozilla developer page at <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey">https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey</a>.
     
+<button id="Generate_keys_crypto" onclick="Generate_keys_crypto()" style="display:block">Generate public private keys using Web API SubtleCrypto</button>
+    <br>
+    <label id="Public_private_keys_label" style="display:none">Public private keys in JSON Web Key format</label>
+    <br>
+    <textarea id="Public_private_keys" rows="4" cols="100" placeholder="Public_private_keys" style="display:block"></textarea>
+    <br>
 
 <!-- --------------------------------------------------- -->
 
@@ -45,7 +54,7 @@
 <script>
 
 
-async function run() {
+async function run_encoding() {
   
   const string_snippet = document.getElementById("string_snippet").value;
 
@@ -56,6 +65,35 @@ async function run() {
   document.getElementById("Base64_decoded").innerHTML = `The base64 decoded string snippet is : ${string_snippet_decoded}.`;
   
 
+}
+
+  
+// ----------------------------------------------------
+
+
+async function Generate_keys_crypto() {
+	// STEP 0: Generate public and private keys (public key=for encrypting, private key=for decrypting)
+   return await window.crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"])
+	   // STEP 1: Obtain RSA key pair as individual objects - https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
+	   // STEP 2: Convert public key and private key into a JSON string (JsonWebKey)
+	   .then(async function(keyPair_obj) { 
+       // -----------------------------
+		   var publicKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.publicKey);
+		   var NEW_publicKey_jwk_str = JSON.stringify(publicKey_jwk);
+		   // publicKey_obj = keyPair_obj.publicKey; // One can directly encrypt string data with this
+       // -----------------------------
+		   var privateKey_jwk = await window.crypto.subtle.exportKey("jwk", keyPair_obj.privateKey);
+		   var NEW_privateKey_jwk_str = JSON.stringify(privateKey_jwk);
+		   // privateKey_obj = keyPair_obj.privateKey;
+		   // -----------------------------
+       document.getElementById("Public_private_keys").innerHTML = `Information used to generate this key were {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"].
+       
+       Public JsonWebKey : ${NEW_publicKey_jwk_str},
+       Private JsonWebKey: ${NEW_privateKey_jwk_str}.`;
+       // -----------------------------
+       return keyPair_obj;
+	   })
+	
 }
 
 </script>
