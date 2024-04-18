@@ -6,4 +6,4 @@ A web application has permission to modify Github file information using the Git
 
 The webapp below converts string data to and from base64, for rapid usage. The webapp also generates public-private data encryption keys in JSON Web Key format, for manual insertion into GitHub Secrets; similar to how GitHub generates tokens for access to GitHub resources. Using GitHub Actions, one can use the keys to: decrypt GitHub repository file data, then perform simple transformations on the data, then re-encrypt the data, and PUT/POST/PATCH the encrypted data back to the GitHub repository file.
 
-[A working version of how to convert strings to different encoding formats (base64, ASCII or byteArray) and a public-private data encryption key generator] https://codesolutions2.github.io/secure_encryption_of_data/encode_string_snippets.html
+[A working version of how to convert strings to different encoding formats (base64, ASCII or byteArray) and a public-private data encryption key generator] https://codesolutions2.github.io/secure_encryption_of_data/encode_decode_data.html
