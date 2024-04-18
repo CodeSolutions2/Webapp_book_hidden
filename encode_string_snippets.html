@@ -7,13 +7,15 @@
 
     <br><br>
 
-     The purpose of this application is to replicate encoding functionality of <a href="https://www.base64encode.org/enc/map">https://www.base64encode.org/enc/map</a> to understand the mapping of encoding methods. 
-    
-    And, to serve as a method to generate public and private data encryption keys. The public key is used to encode user data such that user information is not humanly understandable and thus protected. The private key is used to decode user data when the user would like to access their data using a web application. 
+     The purpose of this application is to:
+    <ul>
+    <li>[A] replicate encoding functionality of <a href="https://www.base64encode.org/enc/map">https://www.base64encode.org/enc/map</a> to understand the mapping of encoding methods.</li>
+    <li>[B] serve as a method to generate public and private data encryption keys. The public key is used to encode user data such that user information is not humanly understandable and thus protected. The private key is used to decode user data when the user would like to access their data using a web application.</li>
+    </ul>
 
     <br><br>
     
-    <h3>String Snippet to encode:</h3>
+    <h3>[A] String Snippet to encode:</h3>
     
     <input id="string_snippet" type="text" value="" placeholder="Enter the string snippet to encode here" rows="3" cols="300">
     
@@ -31,12 +33,11 @@
     <textarea id="Base64_decoded" rows="4" cols="100" placeholder="Base64_decoded" style="display:block"></textarea>
     <br>
 
-    <h3>Generate a pair of public and private data encryption keys in JSON Web Key format:</h3>
+    <h3>[B] Generate a pair of public and private data encryption keys in JSON Web Key format:</h3>
     <ul>
-    <li>The public and private keys are generated using the Rivest–Shamir–Adleman algorithm <a href="https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params">https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params</a>.</li>
-    <li>The algorithm settings used to generate these keys were: {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"]. These settings are important to know for importing the key in GitHub Actions.</li>
-    <li>Copy the public and private JSON Web Keys and manually put them in GitHub Secrets. The public JSON Web Key is used to encode data and the private JSON Web Key is used to decode data. Manually storing the public and private data encryption keys on the GitHub server, using GitHub Secrets, is a secure way to encode and decode data while protecting user information.</li>
-    <li>Use these keys on GitHub Actions, where GitHub Secrets are only accessable, to encode and decode data securely! </li>
+    <li>The public and private keys are generated using the Rivest–Shamir–Adleman algorithm <a href="https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params">https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params</a>. The algorithm settings used to generate these keys were: {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"]. These settings are important to know for importing the key in GitHub Actions.</li>
+    <li>GitHub Secrets: Copy the public and private JSON Web Keys and manually put them in GitHub Secrets. The public JSON Web Key is used to encode data and the private JSON Web Key is used to decode data. Manually storing the public and private data encryption keys on the GitHub server, using GitHub Secrets, is a secure way to use the keys and thus protect user information.</li>
+    <li>GitHub Actions: Use these keys in GitHub Actions, where GitHub Secrets are only accessable, to encode and decode data securely! For more information about using GitHub Secrets in GitHub Actions, please see: <a href="https://docs.github.com/en/rest/actions/secrets?apiVersion=2022-11-28">https://docs.github.com/en/rest/actions/secrets?apiVersion=2022-11-28</a></li>
     <li>For more information about how to use these keys, please see the mozilla developer page at <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey">https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey</a>.</li>
     </ul>  
 	  
@@ -49,7 +50,7 @@
     <br>
     <label id="Private_key_label" style="display:block">Private key in JSON Web Key format</label>
     <br>
-    <textarea id="Private_key" rows="10" cols="100" placeholder="Private_key" style="display:block"></textarea>
+    <textarea id="Private_key" rows="20" cols="100" placeholder="Private_key" style="display:block"></textarea>
     <br>
 
 <!-- --------------------------------------------------- -->
@@ -62,7 +63,8 @@
 <!-- --------------------------------------------------- -->
 
 <script>
-
+	
+// ----------------------------------------------------
 
 async function run_encoding() {
   
