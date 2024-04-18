@@ -9,7 +9,7 @@
 
      The purpose of this application is to replicate encoding functionality of <a href="https://www.base64encode.org/enc/map">https://www.base64encode.org/enc/map</a> to understand the mapping of encoding methods. 
     
-    And, to serve as a method to generate private and public data encryption keys, such that one can place the keys manually in GitHub Secrets. Manually storing the private and public data encryption keys on the GitHub server, using GitHub Secrets, is a secure way to encode and decode data while protecting user information.
+    And, to serve as a method to generate public and private data encryption keys. The public key is used to encode user data such that user information is not humanly understandable and thus protected. The private key is used to decode user data when the user would like to access their data using a web application. 
 
     <br><br>
     
@@ -31,14 +31,15 @@
     <textarea id="Base64_decoded" rows="4" cols="100" placeholder="Base64_decoded" style="display:block"></textarea>
     <br>
 
-    <h3>Generate a pair of private and public data encryption keys in JSON Web Key format, using the Rivest–Shamir–Adleman algorithm <a href="https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params">https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params</a>:</h3>
-    Copy the public and private JSON Web Keys and manually put them in GitHub Secrets, the public JSON Web Key is used to encode data and the private JSON Web Key is used to decode data. 
+    <h3>Generate a pair of public and private data encryption keys in JSON Web Key format:</h3>
+    <ul>
+    <li>The public and private keys are generated using the Rivest–Shamir–Adleman algorithm <a href="https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params">https://www.w3.org/TR/WebCryptoAPI/#rsa-oaep-params</a>.</li>
+    <li>The algorithm settings used to generate these keys were: {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"]. These settings are important to know for importing the key in GitHub Actions.</li>
+    <li>Copy the public and private JSON Web Keys and manually put them in GitHub Secrets. The public JSON Web Key is used to encode data and the private JSON Web Key is used to decode data. Manually storing the public and private data encryption keys on the GitHub server, using GitHub Secrets, is a secure way to encode and decode data while protecting user information.</li>
+    <li>Use these keys on GitHub Actions, where GitHub Secrets are only accessable, to encode and decode data securely! </li>
+    <li>For more information about how to use these keys, please see the mozilla developer page at <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey">https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey</a>.</li>
+    </ul>  
 	  
-Use these keys on GitHub Actions, GitHub Secrets are only accessable from GitHub Actions, to encode and decode data securely! 
-	  
-For more information about how to use these keys, please see the mozilla developer page at <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey">https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey</a>.
-
-The algorithm settings used to generate these keys were: {name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, true, ["encrypt", "decrypt"]. These settings are important to know for importing the key in GitHub Actions.
     <br>
 <button id="Generate_keys_crypto" onclick="Generate_keys_crypto()" style="display:block">Generate public private keys using Web API SubtleCrypto</button>
     <br>
